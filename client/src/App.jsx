@@ -1,8 +1,9 @@
-import Home from './pages/Main/Home'
+import NavigationBar from './components/Home/NavigationBar'
+
 const App = () => {
   return (
     <>
-      <Home />
+      <NavigationBar />
     </>
   )
 }
