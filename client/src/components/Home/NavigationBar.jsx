@@ -94,8 +94,8 @@ const NavBar = () => {
                   onMouseLeave={() => setFlyer(false)}
                   className={
                     flyer
-                      ? ' opacity-100 translate-y-0 transition ease-out duration-200 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
-                      : ' opacity-0 translate-y-1 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
+                      ? '  translate-y-0 transition ease-out duration-200 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
+                      : ' hidden translate-y-1 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
                   }
                 >
                   <div className='rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden'>
@@ -321,8 +321,8 @@ const NavBar = () => {
                   onMouseLeave={() => setFlyerTwo(false)}
                   className={
                     flyerTwo
-                      ? ' opacity-100 translate-y-0 transition ease-out duration-200 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
-                      : ' opacity-0 translate-y-1 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
+                      ? '  translate-y-0 transition ease-out duration-200 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
+                      : ' hidden translate-y-1 absolute z-10 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
                   }
                 >
                   <div className='rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden'>
@@ -525,12 +525,12 @@ const NavBar = () => {
         <div
           className={
             open
-              ? 'opacity-100 scale-100 transition ease-out duration-200 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden'
-              : 'opacity-0 scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden'
+              ? ' z-10 scale-100 transition ease-out duration-200 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden'
+              : 'hidden scale-95 absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden'
           }
         >
           <div className='rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50'>
-            <div className='pt-5 pb-6 px-5'>
+            <div className='pt-5 pb-6 px-5 z-100'>
               <div className='flex items-center justify-between'>
                 <div>
                   <img
