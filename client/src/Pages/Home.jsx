@@ -1,4 +1,5 @@
 import { CarouselSlider } from '@/components/Home/CarouselSlider'
+import Cats from '@/components/Home/Cats'
 import NavigationBar from '../components/Home/NavigationBar'
 
 const Home = () => {
@@ -8,6 +9,7 @@ const Home = () => {
   return (
     <>
       <NavigationBar />
+      <Cats />
       <div className='container mx-auto px-4'>
         <div className='flex flex-wrap -mx-2'>
           {Array.from({ length: sliderCount }).map((_, index) => (
