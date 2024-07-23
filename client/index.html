@@ -15,12 +15,20 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      padding: 0;
+      height: 100%;
       margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .app-container {
+      max-width: 1400px;
+      width: 100%;
+      box-sizing: border-box; /* Ensure padding is included in width */
     }
   </style>
   <body>
-    <div id="root"></div>
+    <div id="root" class="app-container"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

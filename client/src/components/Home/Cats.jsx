@@ -1,12 +1,12 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa' // Using FontAwesome for arrows
 
 const filterOptions = [
   { id: 1, name: 'Groceries', icon: '🛒' },
   { id: 2, name: 'Restaurants', icon: '🍽️' },
   { id: 3, name: 'Plumbers', icon: '🔧' },
-  { id: 4, name: 'Convenience Stores', icon: '🛍️' },
-  { id: 5, name: 'Massage Parlors', icon: '💆‍♂️' },
+  { id: 4, name: 'Pet Stores', icon: '🐶' },
+  { id: 5, name: 'Florists', icon: '💐' },
   { id: 6, name: 'Gyms', icon: '💪' },
   { id: 7, name: 'Parks', icon: '🌳' },
   { id: 8, name: 'Beaches', icon: '🏖️' },
@@ -15,12 +15,12 @@ const filterOptions = [
   { id: 11, name: 'Salons', icon: '💇‍♀️' },
   { id: 12, name: 'Pharmacies', icon: '💊' },
   { id: 13, name: 'Libraries', icon: '📚' },
+  { id: 18, name: 'Convenience Stores', icon: '🛍️' },
+  { id: 19, name: 'Massage Parlors', icon: '💆‍♂️' },
   { id: 14, name: 'Hospitals', icon: '🏥' },
   { id: 15, name: 'Clothing Stores', icon: '👗' },
   { id: 16, name: 'Electronics Stores', icon: '💻' },
   { id: 17, name: 'Bookstores', icon: '📖' },
-  { id: 18, name: 'Pet Stores', icon: '🐶' },
-  { id: 19, name: 'Florists', icon: '💐' },
   { id: 20, name: 'Auto Repair', icon: '🔧' },
   { id: 21, name: 'Health Services', icon: '🏥' },
   { id: 22, name: 'Beauty & Wellness', icon: '💄' },
@@ -51,7 +51,7 @@ const Cats = () => {
         </button>
         <div
           ref={containerRef}
-          className='flex overflow-x-auto space-x-4 py-4 px-2 scrollbar-hide'
+          className='flex overflow-x-auto space-x-4 py-4 px-2 no-scrollbar'
           style={{ overflowY: 'hidden' }} // Hide vertical scrollbar
         >
           {filterOptions.map((category) => (
