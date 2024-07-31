@@ -1,6 +1,8 @@
 import { CarouselSlider } from '@/components/Home/CarouselSlider'
 import Cats from '@/components/Home/Cats'
-import NavigationBar from '../components/Home/NavigationBar'
+import SearchBar from '@/components/Home/SearchBar'
+import Footer from '@/components/Layout/Footer'
+import NavigationBar from '../../components/Layout/NavigationBar'
 
 const Home = () => {
   // Number of CarouselSlider components you want to display
@@ -9,6 +11,7 @@ const Home = () => {
   return (
     <>
       <NavigationBar />
+      <SearchBar />
       <Cats />
       <div className='container mx-auto px-4'>
         <div className='flex flex-wrap -mx-2'>
@@ -32,6 +35,7 @@ const Home = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </>
   )
 }
