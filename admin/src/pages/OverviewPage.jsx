@@ -4,6 +4,7 @@ import { BarChart2, ShoppingBag, Users, Zap } from 'lucide-react'
 import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 import CategoryDistributionChart from '../components/overview/CategoryDistributionChart'
+import EmailData from '../components/overview/EmailData'
 import SalesChannelChart from '../components/overview/SalesChannelChart'
 import SalesOverviewChart from '../components/overview/SalesOverviewChart'
 
@@ -47,6 +48,7 @@ const OverviewPage = () => {
         </motion.div>
 
         {/* CHARTS */}
+        <EmailData />
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
           <SalesOverviewChart />

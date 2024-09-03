@@ -2,13 +2,14 @@ import { Route, Routes } from 'react-router-dom'
 
 import Sidebar from './components/common/Sidebar'
 
-import AnalyticsPage from './pages/AnalyticsPage'
+import EditBusiness from './components/business/EditBusiness'
 import BookingsPage from './pages/BookingsPage'
+import BusinessPage from './pages/BusinessPage'
+import FlyerPage from './pages/FlyerPage'
+import MembershipPage from './pages/MembershipPage'
 import OverviewPage from './pages/OverviewPage'
-import ProductsPage from './pages/ProductsPage'
-import SalesPage from './pages/SalesPage'
 import SettingsPage from './pages/SettingsPage'
-import UsersPage from './pages/UsersPage'
+import SubscribersPage from './pages/SubscribersPage'
 
 function App() {
   return (
@@ -22,11 +23,12 @@ function App() {
       <Sidebar />
       <Routes>
         <Route path='/' element={<OverviewPage />} />
-        <Route path='/products' element={<ProductsPage />} />
-        <Route path='/users' element={<UsersPage />} />
-        <Route path='/sales' element={<SalesPage />} />
+        <Route path='/business' element={<BusinessPage />} />
+        <Route path='/edit-business/:id' element={<EditBusiness />} />
+        <Route path='/users' element={<SubscribersPage />} />
+        <Route path='/sales' element={<FlyerPage />} />
         <Route path='/Bookings' element={<BookingsPage />} />
-        <Route path='/analytics' element={<AnalyticsPage />} />
+        <Route path='/Membership' element={<MembershipPage />} />
         <Route path='/settings' element={<SettingsPage />} />
       </Routes>
     </div>

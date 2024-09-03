@@ -1,29 +1,49 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   BarChart2,
-  DollarSign,
+  Building2,
+  Flame,
   Menu,
-  Scroll,
+  ScanEye,
   Settings,
-  ShoppingCart,
-  TrendingUp,
-  Users,
+  SquareMenu,
+  UserRoundCheck,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const SIDEBAR_ITEMS = [
   {
-    name: 'Overview',
+    name: 'Dashboard',
     icon: BarChart2,
     color: '#6366f1',
     href: '/',
   },
-  { name: 'Listings', icon: Scroll, color: '#8B5CF6', href: '/products' },
-  { name: 'Users', icon: Users, color: '#EC4899', href: '/users' },
-  { name: 'Sales', icon: DollarSign, color: '#10B981', href: '/sales' },
-  { name: 'Bookings', icon: ShoppingCart, color: '#F59E0B', href: '/Bookings' },
-  { name: 'Analytics', icon: TrendingUp, color: '#3B82F6', href: '/analytics' },
+  {
+    name: 'Business',
+    icon: Building2,
+    color: '#8B5CF6',
+    href: '/business',
+  },
+  {
+    name: 'Subscribers',
+    icon: UserRoundCheck,
+    color: '#EC4899',
+    href: '/users',
+  },
+  { name: 'Digital Flyer', icon: SquareMenu, color: '#10B981', href: '/sales' },
+  {
+    name: 'Review Filter',
+    icon: ScanEye,
+    color: '#F59E0B',
+    href: '/Bookings',
+  },
+  {
+    name: 'Membership',
+    icon: Flame,
+    color: '#3B82F6',
+    href: '/Membership',
+  },
   { name: 'Settings', icon: Settings, color: '#6EE7B7', href: '/settings' },
 ]
 

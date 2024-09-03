@@ -4,9 +4,9 @@ import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 
 import { AlertTriangle, DollarSign, Package, TrendingUp } from 'lucide-react'
+import BusinessTable from '../components/business/BusinessTable'
+import SalesTrendChart from '../components/business/SalesTrendChart'
 import CategoryDistributionChart from '../components/overview/CategoryDistributionChart'
-import ProductsTable from '../components/products/ProductsTable'
-import SalesTrendChart from '../components/products/SalesTrendChart'
 
 const ProductsPage = () => {
   return (
@@ -47,7 +47,7 @@ const ProductsPage = () => {
           />
         </motion.div>
 
-        <ProductsTable />
+        <BusinessTable />
 
         {/* CHARTS */}
         <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
