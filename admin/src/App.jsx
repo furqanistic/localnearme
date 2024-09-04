@@ -6,9 +6,13 @@ import EditBusiness from './components/business/EditBusiness'
 import BookingsPage from './pages/BookingsPage'
 import BusinessPage from './pages/BusinessPage'
 import FlyerPage from './pages/FlyerPage'
+import LocalGuidePage from './pages/LocalGuidePage'
 import MembershipPage from './pages/MembershipPage'
+import MyFeed from './pages/MyFeed'
 import OverviewPage from './pages/OverviewPage'
 import SettingsPage from './pages/SettingsPage'
+import ShortTermRentals from './pages/ShortTermRentals'
+import SubscribedFlyers from './pages/SubscribedFlyers'
 import SubscribersPage from './pages/SubscribersPage'
 
 function App() {
@@ -26,7 +30,11 @@ function App() {
         <Route path='/business' element={<BusinessPage />} />
         <Route path='/edit-business/:id' element={<EditBusiness />} />
         <Route path='/users' element={<SubscribersPage />} />
+        <Route path='/myfeed' element={<MyFeed />} />
         <Route path='/sales' element={<FlyerPage />} />
+        <Route path='/subscribed-flyers' element={<SubscribedFlyers />} />
+        <Route path='/short-term-rentals' element={<ShortTermRentals />} />
+        <Route path='/local-guide' element={<LocalGuidePage />} />
         <Route path='/Bookings' element={<BookingsPage />} />
         <Route path='/Membership' element={<MembershipPage />} />
         <Route path='/settings' element={<SettingsPage />} />

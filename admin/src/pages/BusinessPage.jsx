@@ -4,6 +4,7 @@ import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 
 import { AlertTriangle, DollarSign, Package, TrendingUp } from 'lucide-react'
+import BusinessExplorer from '../components/business/BusinessExplorer'
 import BusinessTable from '../components/business/BusinessTable'
 import SalesTrendChart from '../components/business/SalesTrendChart'
 import CategoryDistributionChart from '../components/overview/CategoryDistributionChart'
@@ -48,6 +49,7 @@ const ProductsPage = () => {
         </motion.div>
 
         <BusinessTable />
+        <BusinessExplorer userLocation='Canada' />
 
         {/* CHARTS */}
         <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
