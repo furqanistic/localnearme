@@ -8,11 +8,12 @@ import BusinessPage from './pages/BusinessPage'
 import FlyerPage from './pages/FlyerPage'
 import LocalGuidePage from './pages/LocalGuidePage'
 import MembershipPage from './pages/MembershipPage'
-import MyFeed from './pages/MyFeed'
+import MyFeed from './pages/MyFeedPage'
+import MyRentalsPage from './pages/MyRentalsPage'
 import OverviewPage from './pages/OverviewPage'
 import SettingsPage from './pages/SettingsPage'
-import ShortTermRentals from './pages/ShortTermRentals'
-import SubscribedFlyers from './pages/SubscribedFlyers'
+import ShortTermRentals from './pages/ShortTermRentalsPage'
+import SubscribedFlyers from './pages/SubscribedFlyersPage'
 import SubscribersPage from './pages/SubscribersPage'
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path='/short-term-rentals' element={<ShortTermRentals />} />
         <Route path='/local-guide' element={<LocalGuidePage />} />
         <Route path='/Bookings' element={<BookingsPage />} />
+        <Route path='/my-rentals' element={<MyRentalsPage />} />
         <Route path='/Membership' element={<MembershipPage />} />
         <Route path='/settings' element={<SettingsPage />} />
       </Routes>

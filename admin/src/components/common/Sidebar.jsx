@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   BarChart2,
   Building2,
+  CookingPot,
   Flame,
   HandHelping,
   MailCheck,
@@ -59,6 +60,13 @@ const SIDEBAR_ITEMS = [
     icon: HandHelping,
     color: '#76f333',
     href: '/short-term-rentals',
+  },
+  {
+    name: 'My Rentals',
+    icon: CookingPot,
+
+    color: '#ff9500',
+    href: '/my-rentals',
   },
   {
     name: 'Local Guide',

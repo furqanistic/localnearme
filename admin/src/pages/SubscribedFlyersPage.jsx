@@ -1,7 +1,7 @@
 import Header from '../components/common/Header'
 import SubscribedBusinesses from '../components/subscribedFlyers/SubscribedBusinesses'
 
-const SubscribedFlyers = () => {
+const SubscribedFlyersPage = () => {
   return (
     <>
       <div className='flex-1 relative z-10 overflow-auto'>
@@ -12,4 +12,4 @@ const SubscribedFlyers = () => {
   )
 }
 
-export default SubscribedFlyers
+export default SubscribedFlyersPage
