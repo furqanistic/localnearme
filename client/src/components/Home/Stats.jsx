@@ -49,10 +49,10 @@ const StatisticsContent = () => (
       { value: '50+', label: 'Deals and Promotions Offered' },
     ].map((stat, index) => (
       <div key={index} className='flex flex-col items-center justify-center'>
-        <dt className='mb-2 text-3xl font-extrabold text-deep-purple-700'>
+        <dt className='mb-2 text-3xl font-extrabold text-gray-100'>
           {stat.value}
         </dt>
-        <dd className='text-sm font-medium text-deep-purple-500 text-center'>
+        <dd className='text-sm font-medium text-gray-100 text-center'>
           {stat.label}
         </dd>
       </div>
@@ -62,7 +62,7 @@ const StatisticsContent = () => (
 
 const ServicesContent = () => (
   <div className='space-y-6'>
-    <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
+    <h2 className='text-2xl font-bold text-white dark:text-white'>
       How we are the best
     </h2>
     <ul className='space-y-4 text-gray-500 dark:text-gray-400'>
@@ -73,7 +73,7 @@ const ServicesContent = () => (
         'Engages both tourists and locals by providing a platform that merges travel with local commerce and interactive features.',
       ].map((service, index) => (
         <li key={index} className='flex items-start'>
-          <ChevronDown className='w-4 h-4 mr-1.5 text-deep-purple-600 dark:text-deep-purple-500 flex-shrink-0 mt-1' />
+          <ChevronDown className='w-4 h-4 mr-1.5 text-gray-600 dark:text-gray-500 flex-shrink-0 mt-1' />
           <span>{service}</span>
         </li>
       ))}
@@ -101,7 +101,11 @@ const FAQContent = () => (
           'Our digital flyer system provides you with exclusive deals and updates from your favorite local spots. By scanning a QR code at participating businesses, you can subscribe to receive digital flyers with special promotions directly to your phone. High ratings prompt you to leave a Google review, while less satisfactory experiences direct you to a feedback form for immediate business attention. This ensures your feedback is valued and you always have access to the latest local deals.',
       },
     ].map((faq, index) => (
-      <AccordionItem key={index} value={`item-${index}`}>
+      <AccordionItem
+        className='text-gray-200'
+        key={index}
+        value={`item-${index}`}
+      >
         <AccordionTrigger>{faq.question}</AccordionTrigger>
         <AccordionContent>
           <p>{faq.answer}</p>

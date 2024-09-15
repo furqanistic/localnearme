@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { BarChart2, ShoppingBag, Users, Zap } from 'lucide-react'
 
+import { useSelector } from 'react-redux'
 import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 import CategoryDistributionChart from '../components/overview/CategoryDistributionChart'

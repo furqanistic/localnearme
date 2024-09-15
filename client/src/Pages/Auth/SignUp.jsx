@@ -1,15 +1,16 @@
 import Footer from '@/components/Layout/Footer'
 import NavBar from '@/components/Layout/NavigationBar'
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 
 const Signup = () => {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   return (
-    <div className='flex flex-col min-h-screen bg-gradient-to-br from-deep-purple-900 to-deep-purple-700'>
+    <div className='flex flex-col min-h-screen bg-gradient-to-br '>
       <NavBar />
+
       <div className='flex-grow flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8'>
         <div className='w-full max-w-md space-y-8 bg-white p-6 rounded-xl shadow-2xl'>
           <div className='text-center'>

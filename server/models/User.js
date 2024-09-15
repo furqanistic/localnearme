@@ -1,19 +1,19 @@
+import bcrypt from 'bcryptjs'
 import mongoose from 'mongoose'
 
 const UserSchema = new mongoose.Schema(
   {
-    // Common fields
-    username: {
+    name: {
       type: String,
       required: true,
+      trim: true,
     },
-    fname: {
+    email: {
       type: String,
       required: true,
-    },
-    lname: {
-      type: String,
-      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -21,11 +21,35 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'client'],
+      enum: ['Admin', 'Business', 'Regular'],
+      default: 'Regular',
+    },
+    businessName: {
+      type: String,
+      trim: true,
+    },
+    phoneNumber: {
+      type: String,
+      trim: true,
+    },
+
+    address: {
+      street: String,
+      city: String,
+      state: String,
+      country: String,
+      zipCode: String,
     },
     registrationDate: {
       type: Date,
       default: Date.now,
+    },
+    lastLogin: {
+      type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     isDeleted: {
       type: Boolean,
@@ -34,4 +58,20 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+
+// Pre-save hook to hash password
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next()
+  this.password = await bcrypt.hash(this.password, 12)
+  next()
+})
+
+// Method to check if password is correct
+UserSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword)
+}
+
 export default mongoose.model('User', UserSchema)

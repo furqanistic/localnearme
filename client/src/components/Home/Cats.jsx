@@ -1,5 +1,6 @@
-import { useRef } from 'react'
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa' // Using FontAwesome for arrows
+import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const filterOptions = [
   { id: 1, name: 'Groceries', icon: '🛒' },
@@ -15,12 +16,12 @@ const filterOptions = [
   { id: 11, name: 'Salons', icon: '💇‍♀️' },
   { id: 12, name: 'Pharmacies', icon: '💊' },
   { id: 13, name: 'Libraries', icon: '📚' },
-  { id: 18, name: 'Convenience Stores', icon: '🛍️' },
-  { id: 19, name: 'Massage Parlors', icon: '💆‍♂️' },
   { id: 14, name: 'Hospitals', icon: '🏥' },
   { id: 15, name: 'Clothing Stores', icon: '👗' },
   { id: 16, name: 'Electronics Stores', icon: '💻' },
   { id: 17, name: 'Bookstores', icon: '📖' },
+  { id: 18, name: 'Convenience Stores', icon: '🛍️' },
+  { id: 19, name: 'Massage Parlors', icon: '💆‍♂️' },
   { id: 20, name: 'Auto Repair', icon: '🔧' },
   { id: 21, name: 'Health Services', icon: '🏥' },
   { id: 22, name: 'Beauty & Wellness', icon: '💄' },
@@ -31,45 +32,75 @@ const filterOptions = [
 
 const Cats = () => {
   const containerRef = useRef(null)
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
 
-  const scrollLeft = () => {
-    containerRef.current.scrollBy({ left: -200, behavior: 'smooth' })
+  const checkScrollPosition = () => {
+    if (containerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = containerRef.current
+      setShowLeftArrow(scrollLeft > 0)
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1)
+    }
   }
 
-  const scrollRight = () => {
-    containerRef.current.scrollBy({ left: 200, behavior: 'smooth' })
+  useEffect(() => {
+    checkScrollPosition()
+    window.addEventListener('resize', checkScrollPosition)
+    return () => window.removeEventListener('resize', checkScrollPosition)
+  }, [])
+
+  const scroll = (direction) => {
+    if (containerRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200
+      containerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+      setTimeout(checkScrollPosition, 300)
+    }
   }
 
   return (
-    <div className='relative'>
+    <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
       <div className='flex items-center'>
-        <button
-          className='absolute left-0 z-10 p-2 bg-gray-200 rounded-full hover:bg-gray-300'
-          onClick={scrollLeft}
+        <motion.button
+          className={`absolute left-0 z-10 p-2 bg-gray-200 rounded-full shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-opacity duration-200 ${
+            showLeftArrow ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => scroll('left')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          aria-label='Scroll left'
         >
-          <FaArrowLeft />
-        </button>
+          <ChevronLeft className='w-6 h-6 text-gray-600' />
+        </motion.button>
         <div
           ref={containerRef}
-          className='flex overflow-x-auto space-x-4 py-4 px-2 no-scrollbar'
-          style={{ overflowY: 'hidden' }} // Hide vertical scrollbar
+          className='flex overflow-x-scroll scrollbar-hide space-x-4 py-4 px-2'
+          onScroll={checkScrollPosition}
         >
           {filterOptions.map((category) => (
-            <div
+            <motion.div
               key={category.id}
-              className='flex-shrink-0 w-24 min-w-max h-24 flex flex-col items-center justify-center bg-white border rounded-lg p-4 text-center font-light transition-colors duration-300 ease-in-out hover:bg-gray-200 sm:w-20 sm:h-20 text-xs sm:text-sm'
+              className='flex-shrink-0 w-24 h-24 flex flex-col items-center justify-center bg-gray-200   rounded-lg p-2 text-center shadow-sm transition-all duration-300 ease-in-out hover:shadow-md hover:border-gray-400 cursor-pointer'
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <div className='text-3xl sm:text-xl'>{category.icon}</div>
-              <span className='mt-2'>{category.name}</span>
-            </div>
+              <div className='text-3xl mb-2'>{category.icon}</div>
+              <span className='text-xs font-lite text-black'>
+                {category.name}
+              </span>
+            </motion.div>
           ))}
         </div>
-        <button
-          className='absolute right-0 z-10 p-2 bg-gray-200 rounded-full hover:bg-gray-300'
-          onClick={scrollRight}
+        <motion.button
+          className={`absolute right-0 z-10 p-2 bg-gray-200 rounded-full shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-opacity duration-200 ${
+            showRightArrow ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => scroll('right')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          aria-label='Scroll right'
         >
-          <FaArrowRight />
-        </button>
+          <ChevronRight className='w-6 h-6 text-gray-600' />
+        </motion.button>
       </div>
     </div>
   )

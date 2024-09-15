@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 // import admissionRoute from './routes/admission.js'
-// import authRoute from './routes/auth.js'
+import authRoute from './routes/auth.js'
 
 const app = express()
 dotenv.config()
@@ -12,7 +12,7 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 mongoose.set('strictQuery', true)
-// app.use('/api/auth/', authRoute)
+app.use('/api/auth/', authRoute)
 // app.use('/api/admission/', admissionRoute)
 
 const connect = () => {

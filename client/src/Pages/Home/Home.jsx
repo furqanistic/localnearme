@@ -20,7 +20,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <h1 className='container mx-auto p-4 font-medium text-3xl'>
+      <h1 className='container mx-auto p-4 font-medium text-3xl text-white'>
         Past experiences
       </h1>
       <div className='container mx-auto px-4'>

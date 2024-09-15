@@ -1,31 +1,32 @@
 import express from 'express'
 import {
+  changePassword,
   deleteUser,
   getAllUsers,
   getUserProfile,
   signin,
   signup,
   updateUser,
-} from '../controllers/auth.js'
-import { verifyToken } from '../verifyToken.js'
+} from '../controller/auth.js'
+import { restrictTo, verifyToken } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
-// Signup route
+// Public routes
 router.post('/signup', signup)
-
-// Signin route
 router.post('/signin', signin)
 
-// Update user
-router.put('/update/:id', updateUser)
-// Delete user route
-router.delete('/delete/:id', deleteUser)
+// Protected routes
+router.use(verifyToken)
 
-// Get user profile route
 router.get('/profile/:id', getUserProfile)
+router.put('/update/:id', updateUser)
+router.put('/change-password', changePassword)
 
-// Get all users route - for admin purposes, so ensure proper authorization in the future
+// Admin only routes
+router.use(restrictTo('admin'))
+
 router.get('/all-users', getAllUsers)
+router.delete('/delete/:id', deleteUser)
 
 export default router
