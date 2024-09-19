@@ -65,13 +65,19 @@ export const signin = async (req, res, next) => {
     const { email, password } = req.body
 
     if (!email || !password) {
-      return next(createError(400, 'Please provide email and password'))
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Please provide email and password',
+      })
     }
 
     const user = await User.findOne({ email }).select('+password')
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-      return next(createError(401, 'Incorrect email or password'))
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Incorrect email or password',
+      })
     }
 
     user.lastLogin = Date.now()
@@ -79,7 +85,11 @@ export const signin = async (req, res, next) => {
 
     createSendToken(user, 200, res)
   } catch (err) {
-    next(err)
+    console.error('Error in signin:', err)
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected error occurred',
+    })
   }
 }
 

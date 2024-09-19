@@ -17,8 +17,8 @@ const Header = ({ title }) => {
   const dropdownRef = useRef(null)
   const { currentUser } = useSelector((state) => state.user)
   const loggedUser = currentUser.data.user
-  const userData = loggedUser || dummyUser
   const dispatch = useDispatch()
+  const userData = loggedUser || dummyUser
   const navigate = useNavigate()
   useEffect(() => {
     const handleClickOutside = (event) => {

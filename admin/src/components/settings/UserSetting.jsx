@@ -10,7 +10,7 @@ const updateUserSettings = async (settings) => {
   return { success: true, message: 'Settings updated successfully!' }
 }
 
-const UserSettings = () => {
+const UserSettings = ({ userNow }) => {
   const [settings, setSettings] = useState({
     email: 'user@example.com',
     currentPassword: '',
@@ -92,7 +92,7 @@ const UserSettings = () => {
                   name='email'
                   id='email'
                   className='bg-gray-700 text-white block w-full pl-10 pr-3 py-2 rounded-md border-gray-600 focus:ring-indigo-500 focus:border-indigo-500'
-                  value={settings.email}
+                  value={userNow.email || settings.email}
                   onChange={handleInputChange}
                   required
                 />

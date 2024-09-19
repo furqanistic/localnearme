@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { axiosInstance } from '../config'
-import { loginStart, loginSuccess } from '../redux/userSlice'
+import { loginFailure, loginStart, loginSuccess } from '../redux/userSlice'
 
 const SignupLoginPage = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -62,24 +62,28 @@ const SignupLoginPage = () => {
 
       const response = await axiosInstance.post(endpoint, payload)
 
-      if (isLogin) {
-        setSuccess('Logged in successfully!')
-        dispatch(loginSuccess(response.data))
-        // Store the token in localStorage or a secure cookie
-        localStorage.setItem('token', response.data.token)
-        setRedirect(true)
+      if (response.data.status === 'success') {
+        if (isLogin) {
+          setSuccess('Logged in successfully!')
+          dispatch(loginSuccess(response.data))
+          localStorage.setItem('token', response.data.token)
+          setRedirect(true)
+        } else {
+          setSuccess('Account created successfully! Please log in.')
+          setIsLogin(true)
+          setName('')
+          setPassword('')
+          setConfirmPassword('')
+          setAgreeTerms(false)
+        }
       } else {
-        setSuccess('Account created successfully! Please log in.')
-        setIsLogin(true)
-        setName('')
-        setPassword('')
-        setConfirmPassword('')
-        setAgreeTerms(false)
+        throw new Error(response.data.message || 'An error occurred')
       }
     } catch (err) {
-      setError(
+      const errorMessage =
         err.response?.data?.message || err.message || 'An error occurred'
-      )
+      setError(errorMessage)
+      dispatch(loginFailure(errorMessage))
     } finally {
       setLoading(false)
     }

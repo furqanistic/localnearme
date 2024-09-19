@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import { Download, Edit, Plus, Search, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Download, Edit, Plus, Search, Trash2, X } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+import { useRef, useState } from 'react'
 import BusinessForm from './BusinessForm'
-
 const BUSINESS_DATA = [
   {
     id: 1,
@@ -82,6 +82,7 @@ const BusinessTable = () => {
   const [userMembership, setUserMembership] = useState('free')
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false)
+  const [isQRPopupOpen, setIsQRPopupOpen] = useState(false)
   const [currentBusiness, setCurrentBusiness] = useState(null)
 
   const handleSearch = (e) => {
@@ -119,22 +120,82 @@ const BusinessTable = () => {
     alert('The business has been successfully deleted.')
   }
 
-  const handleDownloadQR = (id) => {
-    // Logic to generate and download QR code
-    console.log('Download QR for business', id)
-    alert('The QR code has been generated and downloaded.')
+  const handleDownloadQR = (business) => {
+    setCurrentBusiness(business)
+    setIsQRPopupOpen(true)
   }
 
-  const handleClosePopup = () => {
-    setIsAddPopupOpen(false)
-    setIsEditPopupOpen(false)
+  const handleCloseQRPopup = () => {
+    setIsQRPopupOpen(false)
     setCurrentBusiness(null)
   }
 
   const handleSaveBusiness = (businessData) => {
     // Logic to save or update business
     console.log('Save business', businessData)
-    handleClosePopup()
+    handleCloseQRPopup()
+  }
+
+  const QRCodePopup = ({ business, onClose }) => {
+    const qrRef = useRef(null)
+    const storeLink = `https://bisslocal.com/store/${business.id}`
+    const downloadQRCode = () => {
+      const canvas = document.createElement('canvas')
+      const svg = qrRef.current.querySelector('svg')
+      const svgData = new XMLSerializer().serializeToString(svg)
+      const img = new Image()
+      img.onload = () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const pngFile = canvas.toDataURL('image/png')
+        const downloadLink = document.createElement('a')
+        downloadLink.download = `${business.name}_QR.png`
+        downloadLink.href = pngFile
+        downloadLink.click()
+      }
+      img.src = 'data:image/svg+xml;base64,' + btoa(svgData)
+    }
+
+    return (
+      <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
+        <div className='bg-gray-800 rounded-lg p-6 w-full max-w-md'>
+          <div className='flex justify-between items-center mb-4'>
+            <h2 className='text-xl font-semibold text-gray-100'>
+              {business.name}
+            </h2>
+            <button
+              onClick={onClose}
+              className='text-gray-400 hover:text-gray-200'
+            >
+              <X size={24} />
+            </button>
+          </div>
+          <p className='text-gray-300 mb-4'>
+            {`${business.address.street}, ${business.address.city}, ${business.address.province} ${business.address.postalCode}`}
+          </p>
+          <div className='flex justify-center mb-4' ref={qrRef}>
+            <QRCodeSVG
+              value={storeLink}
+              size={200}
+              bgColor='#1F2937'
+              fgColor='#FFFFFF'
+            />
+          </div>
+          <p className='text-gray-400 text-center mb-4'>
+            Scan to visit the store
+          </p>
+          <button
+            onClick={downloadQRCode}
+            className='w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center'
+          >
+            <Download size={18} className='mr-2' />
+            Download QR Code
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -222,7 +283,7 @@ const BusinessTable = () => {
                       <Trash2 size={18} />
                     </button>
                     <button
-                      onClick={() => handleDownloadQR(business.id)}
+                      onClick={() => handleDownloadQR(business)}
                       className='text-green-400 hover:text-green-300 transition-colors duration-200'
                     >
                       <Download size={18} />
@@ -241,10 +302,14 @@ const BusinessTable = () => {
             <BusinessForm
               business={currentBusiness}
               onSave={handleSaveBusiness}
-              onClose={handleClosePopup}
+              onClose={handleCloseQRPopup}
             />
           </div>
         </div>
+      )}
+
+      {isQRPopupOpen && currentBusiness && (
+        <QRCodePopup business={currentBusiness} onClose={handleCloseQRPopup} />
       )}
     </motion.div>
   )
