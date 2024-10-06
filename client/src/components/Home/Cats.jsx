@@ -58,49 +58,62 @@ const Cats = () => {
   }
 
   return (
-    <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-      <div className='flex items-center'>
-        <motion.button
-          className={`absolute left-0 z-10 p-2 bg-gray-200 rounded-full shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-opacity duration-200 ${
-            showLeftArrow ? 'opacity-100' : 'opacity-0'
-          }`}
-          onClick={() => scroll('left')}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label='Scroll left'
-        >
-          <ChevronLeft className='w-6 h-6 text-gray-600' />
-        </motion.button>
-        <div
-          ref={containerRef}
-          className='flex overflow-x-scroll scrollbar-hide space-x-4 py-4 px-2'
-          onScroll={checkScrollPosition}
-        >
-          {filterOptions.map((category) => (
-            <motion.div
-              key={category.id}
-              className='flex-shrink-0 w-24 h-24 flex flex-col items-center justify-center bg-gray-200   rounded-lg p-2 text-center shadow-sm transition-all duration-300 ease-in-out hover:shadow-md hover:border-gray-400 cursor-pointer'
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+    <div className='bg-[#141414] py-12'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <h2 className='text-3xl font-bold text-white mb-6'>
+          Explore Categories
+        </h2>
+        <div className='relative'>
+          <div className='absolute inset-y-0 left-0 flex items-center'>
+            <motion.button
+              className={`z-10 p-2 bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 ${
+                showLeftArrow
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-full'
+              }`}
+              onClick={() => scroll('left')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label='Scroll left'
             >
-              <div className='text-3xl mb-2'>{category.icon}</div>
-              <span className='text-xs font-lite text-black'>
-                {category.name}
-              </span>
-            </motion.div>
-          ))}
+              <ChevronLeft className='w-6 h-6 text-white' />
+            </motion.button>
+          </div>
+          <div
+            ref={containerRef}
+            className='flex overflow-x-scroll scrollbar-hide space-x-4 py-4 px-12'
+            onScroll={checkScrollPosition}
+          >
+            {filterOptions.map((category) => (
+              <motion.div
+                key={category.id}
+                className='flex-shrink-0 w-32 h-32 flex flex-col items-center justify-center bg-gray-800 rounded-xl p-2 text-center shadow-lg transition-all duration-300 ease-in-out hover:bg-gray-700 cursor-pointer border border-gray-700'
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className='text-4xl mb-2'>{category.icon}</div>
+                <span className='text-sm font-medium text-gray-200'>
+                  {category.name}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+          <div className='absolute inset-y-0 right-0 flex items-center'>
+            <motion.button
+              className={`z-10 p-2 bg-blue-500 rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 ${
+                showRightArrow
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-full'
+              }`}
+              onClick={() => scroll('right')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label='Scroll right'
+            >
+              <ChevronRight className='w-6 h-6 text-white' />
+            </motion.button>
+          </div>
         </div>
-        <motion.button
-          className={`absolute right-0 z-10 p-2 bg-gray-200 rounded-full shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-opacity duration-200 ${
-            showRightArrow ? 'opacity-100' : 'opacity-0'
-          }`}
-          onClick={() => scroll('right')}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label='Scroll right'
-        >
-          <ChevronRight className='w-6 h-6 text-gray-600' />
-        </motion.button>
       </div>
     </div>
   )

@@ -32,7 +32,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
     address: {
       street: String,
       city: String,
@@ -55,6 +54,7 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    passwordChangedAt: Date, // Add this field
   },
   { timestamps: true }
 )
@@ -72,6 +72,18 @@ UserSchema.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword)
+}
+
+// Add this method
+UserSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    )
+    return JWTTimestamp < changedTimestamp
+  }
+  return false
 }
 
 export default mongoose.model('User', UserSchema)

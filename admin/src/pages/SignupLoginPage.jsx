@@ -51,22 +51,18 @@ const SignupLoginPage = () => {
     setError('')
     setSuccess('')
     setLoading(true)
-
     try {
       if (!isLogin && password !== confirmPassword) {
         throw new Error('Passwords do not match')
       }
-
       const endpoint = isLogin ? '/auth/signin' : '/auth/signup'
       const payload = isLogin ? { email, password } : { name, email, password }
-
       const response = await axiosInstance.post(endpoint, payload)
-
       if (response.data.status === 'success') {
         if (isLogin) {
           setSuccess('Logged in successfully!')
           dispatch(loginSuccess(response.data))
-          localStorage.setItem('token', response.data.token)
+          // Remove this line: localStorage.setItem('token', response.data.token)
           setRedirect(true)
         } else {
           setSuccess('Account created successfully! Please log in.')

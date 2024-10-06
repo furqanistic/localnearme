@@ -8,6 +8,7 @@ import {
   Globe,
   HelpCircle,
   Home,
+  LayoutDashboard,
   LogOut,
   Mail,
   MapPin,
@@ -140,8 +141,13 @@ const Navigationbar = () => {
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
           <div className='flex items-center'>
-            <Link to='/' className='flex-shrink-0'>
-              <img className='h-8 w-auto' src='/logoicon.png' alt='Logo' />
+            <Link to='/' className='flex-shrink-0 flex items-center gap-2'>
+              <img
+                className='h-12 w-auto bg-white p-1 rounded'
+                src='https://dashboard.bisslocal.com/weblogo.png'
+                alt='Logo'
+              />
+              <h1 className='text-white text-xl font-bold'>BissLocal</h1>
             </Link>
           </div>
           <div className='hidden md:flex items-center space-x-4'>
@@ -153,7 +159,11 @@ const Navigationbar = () => {
               onClick={() => toggleDropdown('explore')}
             />
             <NavItem icon={Coffee} label='About Us' href='/about' />
-            <NavItem icon={HelpCircle} label='Connect' href='/connect' />
+            <NavItem
+              icon={LayoutDashboard}
+              label='Dashboard'
+              href='https://dashboard.bisslocal.com/'
+            />
             <NavItem
               icon={Menu}
               label='More'
@@ -281,7 +291,11 @@ const Navigationbar = () => {
                 onClick={() => toggleDropdown('explore')}
               />
               <NavItem icon={Coffee} label='About Us' href='/about' />
-              <NavItem icon={HelpCircle} label='Connect' href='/connect' />
+              <NavItem
+                icon={LayoutDashboard}
+                label='Dashboard'
+                href='https://dashboard.bisslocal.com/'
+              />
               <NavItem
                 icon={Menu}
                 label='More'

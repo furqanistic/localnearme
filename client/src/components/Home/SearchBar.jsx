@@ -1,12 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Search } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const SearchBar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('All categories')
   const dropdownRef = useRef(null)
-
   const categories = ['All categories', 'Airbnb', 'Store', 'Local Guide']
 
   const toggleDropdown = () => {
@@ -24,7 +23,6 @@ const SearchBar = () => {
         setDropdownVisible(false)
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -39,7 +37,7 @@ const SearchBar = () => {
             <button
               type='button'
               onClick={toggleDropdown}
-              className='flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-l-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out'
+              className='flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-200 bg-gray-700 border border-gray-600 rounded-l-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out'
             >
               {selectedCategory}
               <ChevronDown className='ml-2 h-4 w-4' />
@@ -52,7 +50,7 @@ const SearchBar = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className='absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10'
+                  className='absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-10'
                 >
                   <div
                     className='py-1'
@@ -64,7 +62,7 @@ const SearchBar = () => {
                       <button
                         key={category}
                         onClick={() => handleCategorySelect(category)}
-                        className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        className='block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white'
                         role='menuitem'
                       >
                         {category}
@@ -77,13 +75,13 @@ const SearchBar = () => {
           </div>
           <input
             type='search'
-            className='block w-full pl-4 pr-12 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-150 ease-in-out'
+            className='block w-full pl-4 pr-12 py-2 bg-gray-700 border border-gray-600 rounded-r-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out'
             placeholder='Search City Name...'
             required
           />
           <button
             type='submit'
-            className='absolute inset-y-0 right-0 flex items-center px-4 text-gray-700 bg-gray-100 border border-gray-300 rounded-r-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out'
+            className='absolute inset-y-0 right-0 flex items-center px-4 text-gray-200 bg-blue-600 border border-blue-600 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out'
           >
             <Search className='h-5 w-5' />
             <span className='sr-only'>Search</span>

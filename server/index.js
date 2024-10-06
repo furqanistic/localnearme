@@ -3,17 +3,59 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
-// import admissionRoute from './routes/admission.js'
 import authRoute from './routes/auth.js'
+import businessRoute from './routes/business.js'
 
 const app = express()
 dotenv.config()
+
+const allowedOrigins = [
+  process.env.NODE_ENV === 'production'
+    ? 'https://bisslocal.com'
+    : 'http://localhost:5173',
+  'https://dashboard.bisslocal.com',
+]
+
 app.use(cookieParser())
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+)
+
 app.use(express.json())
-app.use(cors())
 mongoose.set('strictQuery', true)
+
+app.options('*', cors()) // Enable pre-flight requests for all routes
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin)
+  }
+  res.header('Access-Control-Allow-Credentials', true)
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET,PUT,POST,DELETE,UPDATE,OPTIONS'
+  )
+  res.header(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept'
+  )
+  next()
+})
+
 app.use('/api/auth/', authRoute)
-// app.use('/api/admission/', admissionRoute)
+app.use('/api/business/', businessRoute)
 
 const connect = () => {
   mongoose
@@ -23,6 +65,7 @@ const connect = () => {
     })
     .catch((err) => console.log(err))
 }
+
 app.use((err, req, res, next) => {
   const status = err.status || 500
   const message = err.message || 'Something went wrong'
@@ -32,6 +75,7 @@ app.use((err, req, res, next) => {
     message,
   })
 })
+
 app.listen(8800, () => {
   connect()
   console.log('Server running at 8800')

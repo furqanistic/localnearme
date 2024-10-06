@@ -3,9 +3,17 @@ import Business from '../models/Business.js'
 
 export const createBusiness = async (req, res, next) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'You must be logged in to create a business',
+      })
+    }
+
     const newBusiness = await Business.create({
       ...req.body,
-      owner: req.user.id, // Assuming you have authentication middleware
+      owner: req.user.id,
+      role: req.user.role, // Use the role from req.user
     })
 
     res.status(201).json({
@@ -22,11 +30,9 @@ export const createBusiness = async (req, res, next) => {
 export const getBusiness = async (req, res, next) => {
   try {
     const business = await Business.findById(req.params.id)
-
     if (!business) {
       return next(createError(404, 'No business found with that ID'))
     }
-
     res.status(200).json({
       status: 'success',
       data: {
@@ -40,6 +46,21 @@ export const getBusiness = async (req, res, next) => {
 
 export const updateBusiness = async (req, res, next) => {
   try {
+    const business = await Business.findById(req.params.id)
+    if (!business) {
+      return next(createError(404, 'No business found with that ID'))
+    }
+
+    // Check if the user is the owner or an admin
+    if (
+      business.owner.toString() !== req.user.id &&
+      req.user.role !== 'Admin'
+    ) {
+      return next(
+        createError(403, 'You do not have permission to update this business')
+      )
+    }
+
     const updatedBusiness = await Business.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -48,10 +69,6 @@ export const updateBusiness = async (req, res, next) => {
         runValidators: true,
       }
     )
-
-    if (!updatedBusiness) {
-      return next(createError(404, 'No business found with that ID'))
-    }
 
     res.status(200).json({
       status: 'success',
@@ -66,11 +83,17 @@ export const updateBusiness = async (req, res, next) => {
 
 export const deleteBusiness = async (req, res, next) => {
   try {
-    const business = await Business.findByIdAndDelete(req.params.id)
-
+    const business = await Business.findById(req.params.id)
     if (!business) {
       return next(createError(404, 'No business found with that ID'))
     }
+
+    // Only admin can delete a business
+    if (req.user.role !== 'Admin') {
+      return next(createError(403, 'Only admins can delete businesses'))
+    }
+
+    await Business.findByIdAndDelete(req.params.id)
 
     res.status(204).json({
       status: 'success',
@@ -84,7 +107,6 @@ export const deleteBusiness = async (req, res, next) => {
 export const getAllBusinesses = async (req, res, next) => {
   try {
     const businesses = await Business.find()
-
     res.status(200).json({
       status: 'success',
       results: businesses.length,
@@ -100,12 +122,24 @@ export const getAllBusinesses = async (req, res, next) => {
 export const sendDigitalFlyer = async (req, res, next) => {
   try {
     const business = await Business.findById(req.params.id)
-
     if (!business) {
       return next(createError(404, 'No business found with that ID'))
     }
 
-    if (!business.digitalFlyer.isActive) {
+    // Check if the user is the owner or an admin
+    if (
+      business.owner.toString() !== req.user.id &&
+      req.user.role !== 'Admin'
+    ) {
+      return next(
+        createError(
+          403,
+          'You do not have permission to send flyers for this business'
+        )
+      )
+    }
+
+    if (!business.digitalFlyer || !business.digitalFlyer.isActive) {
       return next(
         createError(
           400,

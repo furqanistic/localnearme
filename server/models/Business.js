@@ -7,18 +7,20 @@ const BusinessSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['Admin', 'Business'],
+      required: true,
+    },
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     description: {
       type: String,
-      required: true,
     },
     type: {
       type: String,
-      required: true,
       enum: ['Store', 'Restaurant', 'Point of Interest'],
     },
     address: {
@@ -29,19 +31,10 @@ const BusinessSchema = new mongoose.Schema(
       zipCode: String,
     },
     location: {
-      type: {
-        type: String,
-        enum: ['Point'],
-        default: 'Point',
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
+      type: String,
     },
     contactEmail: {
       type: String,
-      required: true,
     },
     phoneNumber: String,
     websiteUrl: String,

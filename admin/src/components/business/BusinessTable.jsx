@@ -1,112 +1,93 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Download, Edit, Plus, Search, Trash2, X } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useRef, useState } from 'react'
+import ReactDOM from 'react-dom'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import {
+  createBusiness,
+  deleteBusiness,
+  fetchbusiness,
+  sendDigitalFlyer,
+  updateBusiness,
+} from './apiServiceBusiness'
 import BusinessForm from './BusinessForm'
-const BUSINESS_DATA = [
-  {
-    id: 1,
-    name: 'Cozy Downtown Studio',
-    category: 'Short-term Rental',
-    price: 120,
-    stock: 20,
-    sales: 30,
-    address: {
-      street: '123 Maple St',
-      city: 'Toronto',
-      province: 'ON',
-      postalCode: 'M5G 1Z4',
-    },
-  },
-  {
-    id: 2,
-    name: 'Luxury Leather Suite',
-    category: 'Boutique Hotel Room',
-    price: 200,
-    stock: 15,
-    sales: 45,
-    address: {
-      street: '456 Elm Ave',
-      city: 'Vancouver',
-      province: 'BC',
-      postalCode: 'V6B 3K9',
-    },
-  },
-  {
-    id: 3,
-    name: 'Smart Home with Sea View',
-    category: 'Vacation Home',
-    price: 350,
-    stock: 10,
-    sales: 25,
-    address: {
-      street: '789 Ocean Dr',
-      city: 'Halifax',
-      province: 'NS',
-      postalCode: 'B3J 2K9',
-    },
-  },
-  {
-    id: 4,
-    name: 'Private Yoga Retreat Space',
-    category: 'Cottage',
-    price: 90,
-    stock: 25,
-    sales: 40,
-    address: {
-      street: '101 Pine St',
-      city: 'Whistler',
-      province: 'BC',
-      postalCode: 'V0N 1B4',
-    },
-  },
-  {
-    id: 5,
-    name: 'Urban Flat with Coffee Bar',
-    category: 'Condo',
-    price: 130,
-    stock: 15,
-    sales: 35,
-    address: {
-      street: '202 Bay St',
-      city: 'Ottawa',
-      province: 'ON',
-      postalCode: 'K1N 9C4',
-    },
-  },
-]
+import DetailPopup from './DetailPopup'
+
+const PopupWrapper = ({ children, onClose }) => {
+  return ReactDOM.createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className='bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto'
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </motion.div>
+    </motion.div>,
+    document.body
+  )
+}
 
 const BusinessTable = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredBusiness, setFilteredBusiness] = useState(BUSINESS_DATA)
-  const [userMembership, setUserMembership] = useState('free')
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false)
   const [isQRPopupOpen, setIsQRPopupOpen] = useState(false)
+  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false)
   const [currentBusiness, setCurrentBusiness] = useState(null)
 
+  const queryClient = useQueryClient()
+
+  const {
+    data: businesses,
+    isLoading,
+    isError,
+  } = useQuery('businesses', fetchbusiness)
+
+  const createBusinessMutation = useMutation(createBusiness, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('businesses')
+      setIsAddPopupOpen(false)
+    },
+  })
+
+  const updateBusinessMutation = useMutation(updateBusiness, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('businesses')
+      setIsEditPopupOpen(false)
+    },
+  })
+
+  const deleteBusinessMutation = useMutation(deleteBusiness, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('businesses')
+    },
+  })
+
+  const sendDigitalFlyerMutation = useMutation(sendDigitalFlyer)
+
   const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase()
-    setSearchTerm(term)
-    const filtered = BUSINESS_DATA.filter(
-      (business) =>
-        business.name.toLowerCase().includes(term) ||
-        business.category.toLowerCase().includes(term)
-    )
-    setFilteredBusiness(filtered)
+    setSearchTerm(e.target.value.toLowerCase())
   }
 
+  const filteredBusinesses =
+    businesses?.filter(
+      (business) =>
+        business.name.toLowerCase().includes(searchTerm) ||
+        business.type.toLowerCase().includes(searchTerm)
+    ) || []
+
   const handleAddBusiness = () => {
-    const freeListings = BUSINESS_DATA.filter(
-      (b) => b.membershipTier === 'free'
-    ).length
-    if (userMembership === 'free' && freeListings >= 1) {
-      alert(
-        "You've reached the limit for free listings. Please upgrade your membership to add more."
-      )
-    } else {
-      setIsAddPopupOpen(true)
-    }
+    setIsAddPopupOpen(true)
   }
 
   const handleEditBusiness = (business) => {
@@ -115,9 +96,9 @@ const BusinessTable = () => {
   }
 
   const handleDeleteBusiness = (id) => {
-    // Logic to delete business
-    console.log('Delete business', id)
-    alert('The business has been successfully deleted.')
+    if (window.confirm('Are you sure you want to delete this business?')) {
+      deleteBusinessMutation.mutate(id)
+    }
   }
 
   const handleDownloadQR = (business) => {
@@ -125,20 +106,34 @@ const BusinessTable = () => {
     setIsQRPopupOpen(true)
   }
 
-  const handleCloseQRPopup = () => {
+  const handleRowClick = (business) => {
+    setCurrentBusiness(business)
+    setIsDetailPopupOpen(true)
+  }
+
+  const handleClosePopup = () => {
+    setIsAddPopupOpen(false)
+    setIsEditPopupOpen(false)
     setIsQRPopupOpen(false)
+    setIsDetailPopupOpen(false)
     setCurrentBusiness(null)
   }
 
   const handleSaveBusiness = (businessData) => {
-    // Logic to save or update business
-    console.log('Save business', businessData)
-    handleCloseQRPopup()
+    if (currentBusiness) {
+      updateBusinessMutation.mutate({
+        id: currentBusiness._id,
+        ...businessData,
+      })
+    } else {
+      createBusinessMutation.mutate(businessData)
+    }
+    handleClosePopup()
   }
 
   const QRCodePopup = ({ business, onClose }) => {
     const qrRef = useRef(null)
-    const storeLink = `https://bisslocal.com/store/${business.id}`
+    const storeLink = `https://bisslocal.com/store/${business._id}`
     const downloadQRCode = () => {
       const canvas = document.createElement('canvas')
       const svg = qrRef.current.querySelector('svg')
@@ -173,7 +168,7 @@ const BusinessTable = () => {
             </button>
           </div>
           <p className='text-gray-300 mb-4'>
-            {`${business.address.street}, ${business.address.city}, ${business.address.province} ${business.address.postalCode}`}
+            {`${business.address.street}, ${business.address.city}, ${business.address.state} ${business.address.zipCode}`}
           </p>
           <div className='flex justify-center mb-4' ref={qrRef}>
             <QRCodeSVG
@@ -198,9 +193,12 @@ const BusinessTable = () => {
     )
   }
 
+  if (isLoading) return <div>Loading...</div>
+  if (isError) return <div>Error fetching businesses</div>
+
   return (
     <motion.div
-      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-4 sm:p-6 border border-gray-700 mb-8'
+      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-4 sm:p-6 border border-gray-700 mb-8 flex flex-col h-full'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -231,18 +229,24 @@ const BusinessTable = () => {
         </div>
       </div>
 
-      <div className='overflow-x-auto'>
+      <div className='flex-grow overflow-x-auto'>
         <table className='min-w-full divide-y divide-gray-700'>
-          <thead className='bg-gray-700'>
+          <thead className='bg-gray-700 sticky top-0'>
             <tr>
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
                 Name
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
-                Category
+                Type
               </th>
               <th className='hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
                 Address
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
+                Subscribers
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
+                Favorites
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider'>
                 Actions
@@ -251,25 +255,35 @@ const BusinessTable = () => {
           </thead>
 
           <tbody className='bg-gray-800 divide-y divide-gray-700'>
-            {filteredBusiness.map((business) => (
+            {filteredBusinesses.map((business) => (
               <motion.tr
-                key={business.id}
+                key={business._id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                className='hover:bg-gray-700'
+                className='hover:bg-gray-700 cursor-pointer'
+                onClick={() => handleRowClick(business)}
               >
                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>
                   {business.name}
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                  {business.category}
+                  {business.type}
                 </td>
                 <td className='hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
                   {`${business.address.street}, ${business.address.city}`}
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                  <div className='flex space-x-2'>
+                  {business.subscriberCount}
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+                  {business.favoriteCount}
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+                  <div
+                    className='flex space-x-2'
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => handleEditBusiness(business)}
                       className='text-indigo-400 hover:text-indigo-300 transition-colors duration-200'
@@ -277,7 +291,7 @@ const BusinessTable = () => {
                       <Edit size={18} />
                     </button>
                     <button
-                      onClick={() => handleDeleteBusiness(business.id)}
+                      onClick={() => handleDeleteBusiness(business._id)}
                       className='text-red-400 hover:text-red-300 transition-colors duration-200'
                     >
                       <Trash2 size={18} />
@@ -296,21 +310,35 @@ const BusinessTable = () => {
         </table>
       </div>
 
-      {(isAddPopupOpen || isEditPopupOpen) && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-          <div className='bg-gray-800 rounded-lg p-6 w-full max-w-md'>
+      <AnimatePresence>
+        {(isAddPopupOpen || isEditPopupOpen) && (
+          <PopupWrapper onClose={handleClosePopup}>
             <BusinessForm
               business={currentBusiness}
               onSave={handleSaveBusiness}
-              onClose={handleCloseQRPopup}
+              onClose={handleClosePopup}
             />
-          </div>
-        </div>
-      )}
+          </PopupWrapper>
+        )}
 
-      {isQRPopupOpen && currentBusiness && (
-        <QRCodePopup business={currentBusiness} onClose={handleCloseQRPopup} />
-      )}
+        {isQRPopupOpen && currentBusiness && (
+          <PopupWrapper onClose={handleClosePopup}>
+            <QRCodePopup
+              business={currentBusiness}
+              onClose={handleClosePopup}
+            />
+          </PopupWrapper>
+        )}
+
+        {isDetailPopupOpen && currentBusiness && (
+          <PopupWrapper onClose={handleClosePopup}>
+            <DetailPopup
+              business={currentBusiness}
+              onClose={handleClosePopup}
+            />
+          </PopupWrapper>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

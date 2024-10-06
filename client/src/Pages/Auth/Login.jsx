@@ -1,32 +1,35 @@
 import Footer from '@/components/Layout/Footer'
 import NavBar from '@/components/Layout/NavigationBar'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className='flex flex-col min-h-screen bg-gradient-to-br '>
+    <div className='flex flex-col min-h-screen bg-[#141414]'>
       <NavBar />
-      <div className='flex-grow flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8'>
-        <div className='w-full max-w-md space-y-8 bg-white p-6 rounded-xl shadow-2xl'>
+      <div className='flex-grow flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8'>
+        <div className='w-full max-w-md space-y-8 bg-gray-800 p-8 rounded-xl shadow-2xl'>
           <div className='text-center'>
-            <h2 className='mt-6 text-3xl font-bold text-gray-900'>
+            <h2 className='mt-6 text-3xl font-bold text-white'>
               Sign in to your account
             </h2>
-            <p className='mt-2 text-sm text-gray-600'>
+            <p className='mt-2 text-sm text-gray-400'>
               Don't have an account?{' '}
-              <a
-                href='#'
-                className='font-medium text-deep-purple-600 hover:text-deep-purple-500'
-              >
-                Create a free account
-              </a>
+              <Link to='/signup'>
+                <a
+                  href='#'
+                  className='font-medium text-blue-400 hover:text-blue-300 transition-colors'
+                >
+                  Create a free account
+                </a>
+              </Link>
             </p>
           </div>
           <form className='mt-8 space-y-6' action='#' method='POST'>
-            <div className='space-y-4 rounded-md shadow-sm'>
+            <div className='space-y-4'>
               <div>
                 <label htmlFor='email-address' className='sr-only'>
                   Email address
@@ -39,7 +42,7 @@ const Login = () => {
                     type='email'
                     autoComplete='email'
                     required
-                    className='appearance-none rounded-md block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-deep-purple-500 focus:border-deep-purple-500 sm:text-sm'
+                    className='appearance-none rounded-md block w-full pl-10 px-3 py-2 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     placeholder='Email address'
                   />
                 </div>
@@ -56,7 +59,7 @@ const Login = () => {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete='current-password'
                     required
-                    className='appearance-none rounded-md block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-deep-purple-500 focus:border-deep-purple-500 sm:text-sm'
+                    className='appearance-none rounded-md block w-full pl-10 pr-10 px-3 py-2 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     placeholder='Password'
                   />
                   <button
@@ -80,11 +83,11 @@ const Login = () => {
                   id='remember-me'
                   name='remember-me'
                   type='checkbox'
-                  className='h-4 w-4 text-deep-purple-600 focus:ring-deep-purple-500 border-gray-300 rounded'
+                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700'
                 />
                 <label
                   htmlFor='remember-me'
-                  className='ml-2 block text-sm text-gray-900'
+                  className='ml-2 block text-sm text-gray-300'
                 >
                   Remember me
                 </label>
@@ -93,7 +96,7 @@ const Login = () => {
               <div className='text-sm'>
                 <a
                   href='#'
-                  className='font-medium text-deep-purple-600 hover:text-deep-purple-500'
+                  className='font-medium text-blue-400 hover:text-blue-300 transition-colors'
                 >
                   Forgot your password?
                 </a>
@@ -103,7 +106,7 @@ const Login = () => {
             <div>
               <button
                 type='submit'
-                className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-deep-purple-600 hover:bg-deep-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-500'
+                className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300'
               >
                 Sign in
               </button>
@@ -113,17 +116,17 @@ const Login = () => {
           <div className='mt-6'>
             <div className='relative'>
               <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-gray-300'></div>
+                <div className='w-full border-t border-gray-600'></div>
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='px-2 bg-white text-gray-500'>
+                <span className='px-2 bg-gray-800 text-gray-400'>
                   Or continue with
                 </span>
               </div>
             </div>
 
             <div className='mt-6'>
-              <button className='w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-500'>
+              <button className='w-full flex items-center justify-center px-4 py-2 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300'>
                 <svg
                   className='h-5 w-5 mr-2'
                   viewBox='0 0 24 24'

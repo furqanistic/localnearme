@@ -22,9 +22,17 @@ const createSendToken = (user, statusCode, res) => {
       ),
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict', // Add this line
     }
 
     res.cookie('jwt', token, cookieOptions)
+
+    // Log the cookie being set
+    console.log('Setting cookie:', {
+      name: 'jwt',
+      value: token,
+      options: cookieOptions,
+    })
 
     user.password = undefined
 
@@ -83,7 +91,28 @@ export const signin = async (req, res, next) => {
     user.lastLogin = Date.now()
     await user.save({ validateBeforeSave: false })
 
-    createSendToken(user, 200, res)
+    // Create token
+    const token = signToken(user._id)
+
+    // Set cookie
+    res.cookie('jwt', token, {
+      expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    })
+
+    // Remove password from output
+    user.password = undefined
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user,
+      },
+    })
   } catch (err) {
     console.error('Error in signin:', err)
     res.status(500).json({
