@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import EditBusiness from './components/business/EditBusiness'
 import Sidebar from './components/common/Sidebar'
 import BookingsPage from './pages/BookingsPage'
+import BusinessFormPage from './pages/BusinessFormPage'
 import BusinessPage from './pages/BusinessPage'
 import FlyerPage from './pages/FlyerPage'
 import LocalGuidePage from './pages/LocalGuidePage'
@@ -47,7 +47,9 @@ function App() {
           <>
             <Route path='/' element={<OverviewPage />} />
             <Route path='/business' element={<BusinessPage />} />
-            <Route path='/edit-business/:id' element={<EditBusiness />} />
+            <Route path='/business/:id' element={<BusinessFormPage />} />
+            <Route path='/business/add' element={<BusinessFormPage />} />
+            <Route path='/business/edit/:id' element={<BusinessFormPage />} />
             <Route path='/users' element={<SubscribersPage />} />
             <Route path='/myfeed' element={<MyFeed />} />
             <Route path='/sales' element={<FlyerPage />} />

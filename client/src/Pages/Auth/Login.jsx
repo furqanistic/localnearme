@@ -1,11 +1,39 @@
 import Footer from '@/components/Layout/Footer'
 import NavBar from '@/components/Layout/NavigationBar'
+import { axiosInstance } from '@/config'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    try {
+      const response = await axiosInstance.post('auth/signin', {
+        email,
+        password,
+      })
+
+      // Assuming the API returns a token or user data upon successful login
+      const { token, user } = response.data
+
+      // Store the token in localStorage or a secure storage method
+      localStorage.setItem('token', token)
+
+      // Redirect to a dashboard or home page
+      navigate('/')
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred during login')
+    }
+  }
 
   return (
     <div className='flex flex-col min-h-screen bg-[#141414]'>
@@ -18,17 +46,18 @@ const Login = () => {
             </h2>
             <p className='mt-2 text-sm text-gray-400'>
               Don't have an account?{' '}
-              <Link to='/signup'>
-                <a
-                  href='#'
-                  className='font-medium text-blue-400 hover:text-blue-300 transition-colors'
-                >
-                  Create a free account
-                </a>
+              <Link
+                to='/signup'
+                className='font-medium text-blue-400 hover:text-blue-300 transition-colors'
+              >
+                Create a free account
               </Link>
             </p>
           </div>
-          <form className='mt-8 space-y-6' action='#' method='POST'>
+          <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
+            {error && (
+              <p className='text-red-500 text-sm text-center'>{error}</p>
+            )}
             <div className='space-y-4'>
               <div>
                 <label htmlFor='email-address' className='sr-only'>
@@ -44,6 +73,8 @@ const Login = () => {
                     required
                     className='appearance-none rounded-md block w-full pl-10 px-3 py-2 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     placeholder='Email address'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
               </div>
@@ -61,6 +92,8 @@ const Login = () => {
                     required
                     className='appearance-none rounded-md block w-full pl-10 pr-10 px-3 py-2 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     placeholder='Password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type='button'

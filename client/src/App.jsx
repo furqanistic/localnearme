@@ -5,6 +5,8 @@ import Login from './Pages/Auth/Login'
 import SignUp from './Pages/Auth/SignUp'
 import BusinessListingPage from './Pages/Business/BusinessListingPage'
 import Home from './Pages/Home/Home'
+import LocalGuidePage from './Pages/More/LocalGuidePage'
+import TrendingPage from './Pages/More/TrendingPage'
 
 const App = () => {
   return (
@@ -14,8 +16,10 @@ const App = () => {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
-          <Route path='/view-business' element={<BusinessListingPage />} />
+          <Route path='/view-business/:id' element={<BusinessListingPage />} />
           <Route path='/about' element={<AboutUs />} />
+          <Route path='/local-guide' element={<LocalGuidePage />} />
+          <Route path='/trending' element={<TrendingPage />} />
           <Route path='*' element={<Error404 />} />
         </Routes>
       </BrowserRouter>

@@ -1,12 +1,13 @@
+import { logout } from '@/redux/userSlice'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   BookOpen,
   Calendar,
   ChevronDown,
+  CircleUserRound,
   Coffee,
   DollarSign,
   Globe,
-  HelpCircle,
   Home,
   LayoutDashboard,
   LogOut,
@@ -20,7 +21,8 @@ import {
   X,
 } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 
 const NavItem = ({ icon: Icon, label, href, onClick, hasDropdown }) => (
   <div className='relative group'>
@@ -38,9 +40,9 @@ const NavItem = ({ icon: Icon, label, href, onClick, hasDropdown }) => (
   </div>
 )
 
-const DropdownItem = ({ icon: Icon, label, description }) => (
-  <a
-    href='#'
+const DropdownItem = ({ icon: Icon, label, description, href }) => (
+  <Link
+    to={href}
     className='flex items-start p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 ease-in-out'
   >
     <Icon className='flex-shrink-0 h-6 w-6 text-gray-400' />
@@ -48,15 +50,17 @@ const DropdownItem = ({ icon: Icon, label, description }) => (
       <p className='text-sm font-medium text-gray-900'>{label}</p>
       <p className='mt-1 text-xs text-gray-500'>{description}</p>
     </div>
-  </a>
+  </Link>
 )
 
 const Navigationbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [language, setLanguage] = useState('English')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const dropdownRef = useRef(null)
+  const { currentUser } = useSelector((state) => state.user)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const toggleMenu = () => setIsOpen(!isOpen)
   const toggleDropdown = (dropdown) => {
@@ -69,24 +73,28 @@ const Navigationbar = () => {
         icon: ShoppingBag,
         label: 'Stores',
         description: 'Find all stores, sort by trending here!',
+        href: '/trending',
       },
       {
         icon: MapPin,
         label: 'Local Guides',
         description:
           'Guides for local areas, showcasing various stores and services.',
+        href: '/local-guide',
       },
       {
         icon: DollarSign,
         label: 'Plan & Pricing',
         description:
           'Details about different subscription plans and their features.',
+        href: '/pricing',
       },
       {
         icon: Mail,
         label: 'Digital Flyer',
         description:
           'Information about subscribing to digital flyers and managing preferences.',
+        href: '/digital-flyer',
       },
     ],
     more: [
@@ -94,22 +102,26 @@ const Navigationbar = () => {
         icon: User,
         label: 'Create Profile',
         description: 'Create your online profile or storefront.',
+        href: '/create-profile',
       },
       {
         icon: BookOpen,
         label: 'Guides',
         description: 'Learn how to maximize our platform.',
+        href: '/guides',
       },
       {
         icon: Calendar,
         label: 'Events',
         description:
           'See what meet-ups and events we might be planning near you.',
+        href: '/events',
       },
       {
         icon: Shield,
         label: 'Security',
         description: 'Understand how we take your privacy seriously.',
+        href: '/security',
       },
     ],
   }
@@ -136,20 +148,60 @@ const Navigationbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate('/')
+  }
+
+  const UserMenu = () => (
+    <div className='relative group'>
+      <button className='flex items-center text-sm font-medium text-gray-300 hover:text-white focus:outline-none'>
+        <CircleUserRound className='h-6 w-6 rounded-full mr-2' />
+        <span className='hidden sm:inline'>{currentUser.name}</span>
+        <ChevronDown className='w-4 h-4 ml-1 group-hover:transform group-hover:rotate-180 transition-transform duration-200' />
+      </button>
+      <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block'>
+        <Link
+          to='/profile'
+          className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+        >
+          Profile
+        </Link>
+        <Link
+          to='/settings'
+          className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+        >
+          Settings
+        </Link>
+        <button
+          onClick={handleLogout}
+          className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  )
+
   return (
     <nav className='bg-gray-900 shadow-lg'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
+          {/* Logo and branding */}
           <div className='flex items-center'>
             <Link to='/' className='flex-shrink-0 flex items-center gap-2'>
               <img
-                className='h-12 w-auto bg-white p-1 rounded'
+                className='h-8 w-auto sm:h-12 bg-white p-1 rounded'
                 src='https://dashboard.bisslocal.com/weblogo.png'
                 alt='Logo'
               />
-              <h1 className='text-white text-xl font-bold'>BissLocal</h1>
+              <h1 className='text-white text-lg sm:text-xl font-bold'>
+                BissLocal
+              </h1>
             </Link>
           </div>
+
+          {/* Desktop menu */}
           <div className='hidden md:flex items-center space-x-4'>
             <NavItem icon={Home} label='Home' href='/' />
             <NavItem
@@ -171,11 +223,13 @@ const Navigationbar = () => {
               onClick={() => toggleDropdown('more')}
             />
           </div>
+
+          {/* User menu (desktop) */}
           <div className='hidden md:flex items-center space-x-4'>
             <div className='relative group'>
               <button className='flex items-center text-sm font-medium text-gray-300 hover:text-white focus:outline-none'>
                 <Globe className='w-5 h-5 mr-2' />
-                {language}
+                <span className='hidden sm:inline'>{language}</span>
                 <ChevronDown className='w-4 h-4 ml-1 group-hover:transform group-hover:rotate-180 transition-transform duration-200' />
               </button>
               <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block'>
@@ -190,38 +244,8 @@ const Navigationbar = () => {
                 ))}
               </div>
             </div>
-            {isLoggedIn ? (
-              <div className='relative group'>
-                <button className='flex items-center text-sm font-medium text-gray-300 hover:text-white focus:outline-none'>
-                  <img
-                    className='h-8 w-8 rounded-full mr-2'
-                    src='/user-avatar.jpg'
-                    alt='User avatar'
-                  />
-                  <span>John Doe</span>
-                  <ChevronDown className='w-4 h-4 ml-1 group-hover:transform group-hover:rotate-180 transition-transform duration-200' />
-                </button>
-                <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block'>
-                  <Link
-                    to='/profile'
-                    className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to='/settings'
-                    className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    onClick={() => setIsLoggedIn(false)}
-                    className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                  >
-                    Log out
-                  </button>
-                </div>
-              </div>
+            {currentUser ? (
+              <UserMenu />
             ) : (
               <>
                 <Link
@@ -239,6 +263,8 @@ const Navigationbar = () => {
               </>
             )}
           </div>
+
+          {/* Mobile menu button */}
           <div className='md:hidden flex items-center'>
             <button
               onClick={toggleMenu}
@@ -255,6 +281,7 @@ const Navigationbar = () => {
         </div>
       </div>
 
+      {/* Dropdown menus */}
       <AnimatePresence>
         {activeDropdown && (
           <motion.div
@@ -265,7 +292,7 @@ const Navigationbar = () => {
             className='absolute left-0 w-full bg-white shadow-lg z-20'
           >
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
                 {dropdownContent[activeDropdown].map((item, index) => (
                   <DropdownItem key={index} {...item} />
                 ))}
@@ -275,6 +302,7 @@ const Navigationbar = () => {
         )}
       </AnimatePresence>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -303,25 +331,21 @@ const Navigationbar = () => {
               />
             </div>
             <div className='pt-4 pb-3 border-t border-gray-700 bg-gray-800'>
-              {isLoggedIn ? (
+              {currentUser ? (
                 <div className='flex items-center px-5'>
                   <div className='flex-shrink-0'>
-                    <img
-                      className='h-10 w-10 rounded-full'
-                      src='/user-avatar.jpg'
-                      alt='User avatar'
-                    />
+                    <CircleUserRound className='h-10 w-10 rounded-full text-gray-300' />
                   </div>
                   <div className='ml-3'>
                     <div className='text-base font-medium text-white'>
-                      John Doe
+                      {currentUser.name}
                     </div>
                     <div className='text-sm font-medium text-gray-400'>
-                      john@example.com
+                      {currentUser.email}
                     </div>
                   </div>
                   <button
-                    onClick={() => setIsLoggedIn(false)}
+                    onClick={handleLogout}
                     className='ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white'
                   >
                     <span className='sr-only'>Log out</span>

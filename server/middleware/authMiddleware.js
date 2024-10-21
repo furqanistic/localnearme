@@ -100,7 +100,7 @@ export const restrictTo = (...allowedRoles) => {
       console.log('User role not in allowed roles')
       return res.status(403).json({
         status: 'fail',
-        message: 'You do not have permission to perform this action',
+        message: '`You do not have permission to perform this action`',
       })
     }
 

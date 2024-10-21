@@ -1,50 +1,13 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Download, Edit, Plus, Search, Trash2, X } from 'lucide-react'
-import { QRCodeSVG } from 'qrcode.react'
-import { useRef, useState } from 'react'
-import ReactDOM from 'react-dom'
+import { motion } from 'framer-motion'
+import { Download, Edit, Plus, Search, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import {
-  createBusiness,
-  deleteBusiness,
-  fetchbusiness,
-  sendDigitalFlyer,
-  updateBusiness,
-} from './apiServiceBusiness'
-import BusinessForm from './BusinessForm'
-import DetailPopup from './DetailPopup'
-
-const PopupWrapper = ({ children, onClose }) => {
-  return ReactDOM.createPortal(
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className='bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto'
-        onClick={(e) => e.stopPropagation()}
-      >
-        {children}
-      </motion.div>
-    </motion.div>,
-    document.body
-  )
-}
+import { useNavigate } from 'react-router-dom'
+import { deleteBusiness, fetchbusiness } from './apiServiceBusiness'
 
 const BusinessTable = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [isAddPopupOpen, setIsAddPopupOpen] = useState(false)
-  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false)
-  const [isQRPopupOpen, setIsQRPopupOpen] = useState(false)
-  const [isDetailPopupOpen, setIsDetailPopupOpen] = useState(false)
-  const [currentBusiness, setCurrentBusiness] = useState(null)
-
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const {
@@ -53,27 +16,11 @@ const BusinessTable = () => {
     isError,
   } = useQuery('businesses', fetchbusiness)
 
-  const createBusinessMutation = useMutation(createBusiness, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('businesses')
-      setIsAddPopupOpen(false)
-    },
-  })
-
-  const updateBusinessMutation = useMutation(updateBusiness, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('businesses')
-      setIsEditPopupOpen(false)
-    },
-  })
-
   const deleteBusinessMutation = useMutation(deleteBusiness, {
     onSuccess: () => {
       queryClient.invalidateQueries('businesses')
     },
   })
-
-  const sendDigitalFlyerMutation = useMutation(sendDigitalFlyer)
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value.toLowerCase())
@@ -87,12 +34,11 @@ const BusinessTable = () => {
     ) || []
 
   const handleAddBusiness = () => {
-    setIsAddPopupOpen(true)
+    navigate('/business/add')
   }
 
   const handleEditBusiness = (business) => {
-    setCurrentBusiness(business)
-    setIsEditPopupOpen(true)
+    navigate(`/business/edit/${business._id}`)
   }
 
   const handleDeleteBusiness = (id) => {
@@ -102,95 +48,12 @@ const BusinessTable = () => {
   }
 
   const handleDownloadQR = (business) => {
-    setCurrentBusiness(business)
-    setIsQRPopupOpen(true)
+    // Implement QR code download logic here
+    console.log('Download QR for:', business.name)
   }
 
   const handleRowClick = (business) => {
-    setCurrentBusiness(business)
-    setIsDetailPopupOpen(true)
-  }
-
-  const handleClosePopup = () => {
-    setIsAddPopupOpen(false)
-    setIsEditPopupOpen(false)
-    setIsQRPopupOpen(false)
-    setIsDetailPopupOpen(false)
-    setCurrentBusiness(null)
-  }
-
-  const handleSaveBusiness = (businessData) => {
-    if (currentBusiness) {
-      updateBusinessMutation.mutate({
-        id: currentBusiness._id,
-        ...businessData,
-      })
-    } else {
-      createBusinessMutation.mutate(businessData)
-    }
-    handleClosePopup()
-  }
-
-  const QRCodePopup = ({ business, onClose }) => {
-    const qrRef = useRef(null)
-    const storeLink = `https://bisslocal.com/store/${business._id}`
-    const downloadQRCode = () => {
-      const canvas = document.createElement('canvas')
-      const svg = qrRef.current.querySelector('svg')
-      const svgData = new XMLSerializer().serializeToString(svg)
-      const img = new Image()
-      img.onload = () => {
-        canvas.width = img.width
-        canvas.height = img.height
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const pngFile = canvas.toDataURL('image/png')
-        const downloadLink = document.createElement('a')
-        downloadLink.download = `${business.name}_QR.png`
-        downloadLink.href = pngFile
-        downloadLink.click()
-      }
-      img.src = 'data:image/svg+xml;base64,' + btoa(svgData)
-    }
-
-    return (
-      <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-        <div className='bg-gray-800 rounded-lg p-6 w-full max-w-md'>
-          <div className='flex justify-between items-center mb-4'>
-            <h2 className='text-xl font-semibold text-gray-100'>
-              {business.name}
-            </h2>
-            <button
-              onClick={onClose}
-              className='text-gray-400 hover:text-gray-200'
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <p className='text-gray-300 mb-4'>
-            {`${business.address.street}, ${business.address.city}, ${business.address.state} ${business.address.zipCode}`}
-          </p>
-          <div className='flex justify-center mb-4' ref={qrRef}>
-            <QRCodeSVG
-              value={storeLink}
-              size={200}
-              bgColor='#1F2937'
-              fgColor='#FFFFFF'
-            />
-          </div>
-          <p className='text-gray-400 text-center mb-4'>
-            Scan to visit the store
-          </p>
-          <button
-            onClick={downloadQRCode}
-            className='w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center'
-          >
-            <Download size={18} className='mr-2' />
-            Download QR Code
-          </button>
-        </div>
-      </div>
-    )
+    navigate(`/business/${business._id}`)
   }
 
   if (isLoading) return <div>Loading...</div>
@@ -309,36 +172,6 @@ const BusinessTable = () => {
           </tbody>
         </table>
       </div>
-
-      <AnimatePresence>
-        {(isAddPopupOpen || isEditPopupOpen) && (
-          <PopupWrapper onClose={handleClosePopup}>
-            <BusinessForm
-              business={currentBusiness}
-              onSave={handleSaveBusiness}
-              onClose={handleClosePopup}
-            />
-          </PopupWrapper>
-        )}
-
-        {isQRPopupOpen && currentBusiness && (
-          <PopupWrapper onClose={handleClosePopup}>
-            <QRCodePopup
-              business={currentBusiness}
-              onClose={handleClosePopup}
-            />
-          </PopupWrapper>
-        )}
-
-        {isDetailPopupOpen && currentBusiness && (
-          <PopupWrapper onClose={handleClosePopup}>
-            <DetailPopup
-              business={currentBusiness}
-              onClose={handleClosePopup}
-            />
-          </PopupWrapper>
-        )}
-      </AnimatePresence>
     </motion.div>
   )
 }

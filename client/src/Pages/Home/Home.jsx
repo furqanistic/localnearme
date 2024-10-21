@@ -3,29 +3,48 @@ import CustomSlider from '@/components/Home/CustomSlider'
 import SearchBar from '@/components/Home/SearchBar'
 import Stats from '@/components/Home/Stats'
 import Footer from '@/components/Layout/Footer'
+import Loader from '@/components/utils/Loader'
+import { axiosInstance } from '@/config'
+import React, { useState } from 'react'
+import { useQuery } from 'react-query'
 import NavigationBar from '../../components/Layout/NavigationBar'
 
 const Home = () => {
+  const [listings, setListings] = useState([])
   const sliderCount = 7
 
-  const businessData = {
-    name: 'Cozy Corner BnB',
-    type: 'Bed and Breakfast',
-    description: 'A charming bed and breakfast in the heart of the city...',
-    address: {
-      street: '123 Main St',
-      city: 'Anytown',
-      state: 'ST',
-      zipCode: '12345',
+  const { status } = useQuery(
+    'all-business-listings',
+    async () => {
+      const res = await axiosInstance.get(`business`)
+      return res.data.data.businesses
     },
-    websiteUrl: 'https://www.cozycornerbnb.com',
-    phoneNumber: '+1 (555) 123-4567',
+    {
+      onSuccess: (data) => {
+        setListings(data)
+      },
+    }
+  )
 
-    openingHours: [
-      { day: 'Monday', open: '8:00 AM', close: '10:00 PM' },
-      // ... other days
-    ],
-    tags: ['Cozy', 'City Center', 'Free Wi-Fi'],
+  const renderBusinessSliders = (start, end) => {
+    if (status === 'loading') {
+      return Array(end - start)
+        .fill()
+        .map((_, index) => (
+          <CustomSlider key={index} business={{}} isLoading={true} />
+        ))
+    }
+    if (status === 'error') {
+      return <p>Error loading data</p>
+    }
+    if (status === 'success') {
+      return listings
+        .slice(start, end)
+        .map((business, index) => (
+          <CustomSlider key={index} business={business} isLoading={false} />
+        ))
+    }
+    return null
   }
 
   return (
@@ -35,9 +54,7 @@ const Home = () => {
       <Cats />
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-          {Array.from({ length: sliderCount }).map((_, index) => (
-            <CustomSlider business={businessData} key={index} />
-          ))}
+          {renderBusinessSliders(0, sliderCount)}
         </div>
       </div>
       <h1 className='container mx-auto p-4 font-medium text-3xl text-white'>
@@ -45,9 +62,7 @@ const Home = () => {
       </h1>
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-          {Array.from({ length: sliderCount }).map((_, index) => (
-            <CustomSlider business={businessData} key={index} />
-          ))}
+          {renderBusinessSliders(sliderCount, sliderCount * 2)}
         </div>
       </div>
       <Stats />

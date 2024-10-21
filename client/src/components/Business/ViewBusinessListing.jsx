@@ -1,22 +1,29 @@
+import { axiosInstance } from '@/config'
 import {
+  Award,
   Bell,
   ChevronLeft,
   ChevronRight,
-  Clock,
+  FileText,
   Globe,
   Heart,
   Mail,
   MapPin,
+  MessageCircle,
   Phone,
   Share2,
   Star,
   Tag,
 } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from 'react-query'
+import { useParams } from 'react-router-dom'
+import Loader from '../utils/Loader'
 
 const ViewBusinessListing = ({ business }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const param = useParams()
   const nextImage = () => {
     setCurrentImageIndex(
       (prevIndex) => (prevIndex + 1) % business.images.length
@@ -29,6 +36,7 @@ const ViewBusinessListing = ({ business }) => {
         (prevIndex - 1 + business.images.length) % business.images.length
     )
   }
+
   const handleSubscribe = () => {
     setIsSubscribed(!isSubscribed)
     // Here you would typically make an API call to update the subscription status
@@ -65,7 +73,6 @@ const ViewBusinessListing = ({ business }) => {
             <ChevronRight className='w-6 h-6 text-white' />
           </button>
         </div>
-
         {/* Business Info */}
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
           <div className='lg:col-span-2 space-y-8'>
@@ -102,6 +109,32 @@ const ViewBusinessListing = ({ business }) => {
                   <Mail className='w-5 h-5 mr-3 text-blue-400' />
                   <span>{business.contactEmail}</span>
                 </div>
+                {business.googleMapsUrl && (
+                  <div className='flex items-center'>
+                    <MapPin className='w-5 h-5 mr-3 text-blue-400' />
+                    <a
+                      href={business.googleMapsUrl}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-400 hover:text-blue-300 transition-colors'
+                    >
+                      View on Google Maps
+                    </a>
+                  </div>
+                )}
+                {business.menu && (
+                  <div className='flex items-center'>
+                    <FileText className='w-5 h-5 mr-3 text-blue-400' />
+                    <a
+                      href={business.menu}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-400 hover:text-blue-300 transition-colors'
+                    >
+                      View Menu
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -142,6 +175,37 @@ const ViewBusinessListing = ({ business }) => {
                 </div>
               </div>
             )}
+
+            {/* Digital Flyer */}
+            {business.digitalFlyer && business.digitalFlyer.isActive && (
+              <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
+                <h2 className='text-3xl font-semibold mb-6 text-white'>
+                  Digital Flyer
+                </h2>
+                <p>
+                  Subscribe to receive our digital flyer and stay updated on our
+                  latest offers!
+                </p>
+                <p className='mt-2'>
+                  Subscribers: {business.digitalFlyer.subscriberCount}
+                </p>
+              </div>
+            )}
+
+            {/* Review System */}
+            {business.reviewSystem && business.reviewSystem.isActive && (
+              <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
+                <h2 className='text-3xl font-semibold mb-6 text-white'>
+                  Customer Reviews
+                </h2>
+                <p>
+                  We value your feedback! Leave a review and help us improve.
+                </p>
+                <p className='mt-2'>
+                  Minimum rating: {business.reviewSystem.minimumRating} stars
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -164,10 +228,17 @@ const ViewBusinessListing = ({ business }) => {
                   {business.favoriteCount}
                 </p>
                 {business.isPremium && (
-                  <p className='text-yellow-400 font-semibold mt-4'>
+                  <p className='text-yellow-400 font-semibold mt-4 flex items-center'>
+                    <Award className='w-5 h-5 mr-2' />
                     Premium Business
                   </p>
                 )}
+                <p>
+                  <strong className='text-blue-400'>
+                    Minimum Review Filter:
+                  </strong>{' '}
+                  {business.minimumReviewFilter} stars
+                </p>
               </div>
             </div>
 
@@ -202,6 +273,12 @@ const ViewBusinessListing = ({ business }) => {
                   <Star className='w-5 h-5 mr-3' />
                   Google Reviews
                 </a>
+              )}
+              {business.reviewSystem && business.reviewSystem.isActive && (
+                <button className='w-full bg-green-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-green-700 transition-colors duration-300'>
+                  <MessageCircle className='w-5 h-5 mr-3' />
+                  Leave a Review
+                </button>
               )}
             </div>
           </div>
