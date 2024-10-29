@@ -5,6 +5,8 @@ import Login from './Pages/Auth/Login'
 import SignUp from './Pages/Auth/SignUp'
 import BusinessListingPage from './Pages/Business/BusinessListingPage'
 import Home from './Pages/Home/Home'
+import ProfilePage from './Pages/Home/ProfilePage'
+import SettingsPage from './Pages/Home/SettingsPage'
 import LocalGuidePage from './Pages/More/LocalGuidePage'
 import TrendingPage from './Pages/More/TrendingPage'
 
@@ -16,6 +18,8 @@ const App = () => {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/settings' element={<SettingsPage />} />
           <Route path='/view-business/:id' element={<BusinessListingPage />} />
           <Route path='/about' element={<AboutUs />} />
           <Route path='/local-guide' element={<LocalGuidePage />} />

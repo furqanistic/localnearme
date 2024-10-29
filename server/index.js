@@ -14,6 +14,7 @@ const allowedOrigins = [
     ? 'https://bisslocal.com'
     : 'http://localhost:5173',
   'https://dashboard.bisslocal.com',
+  'https://api.bisslocal.com',
 ]
 
 app.use(cookieParser())

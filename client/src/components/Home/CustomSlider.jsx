@@ -5,141 +5,218 @@ import {
   Globe,
   MapPin,
   Phone,
+  Star,
   Tag,
 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-// Skeleton Loader Component
 const SkeletonLoader = () => (
-  <div className='bg-white shadow-lg rounded-lg overflow-hidden animate-pulse'>
-    <div className='w-full h-48 sm:h-64 bg-gray-300'></div>
+  <div className='bg-white shadow-lg rounded-xl overflow-hidden animate-pulse'>
+    <div className='w-full h-52 bg-gray-300'></div>
     <div className='p-4 space-y-2'>
-      <div className='h-6 bg-gray-300 rounded w-3/4'></div>
-      <div className='h-4 bg-gray-300 rounded w-1/2'></div>
-      <div className='h-4 bg-gray-300 rounded w-2/3'></div>
-      <div className='flex space-x-2'>
-        <div className='h-6 bg-gray-300 rounded w-16'></div>
-        <div className='h-6 bg-gray-300 rounded w-16'></div>
-        <div className='h-6 bg-gray-300 rounded w-16'></div>
-      </div>
-      <div className='flex justify-between items-center'>
-        <div className='h-4 bg-gray-300 rounded w-20'></div>
-        <div className='h-4 bg-gray-300 rounded w-24'></div>
+      <div className='h-6 bg-gray-300 rounded-full w-3/4'></div>
+      <div className='h-4 bg-gray-300 rounded-full w-1/2'></div>
+      <div className='flex gap-2'>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className='h-6 bg-gray-300 rounded-full w-16'></div>
+        ))}
       </div>
     </div>
   </div>
 )
 
-// Updated CustomSlider Component
 const CustomSlider = ({ business, isLoading }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [imageErrors, setImageErrors] = useState({})
+  const [isHovered, setIsHovered] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
 
-  const images = [
-    'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2762&q=80',
-    'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2560&q=80',
-    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80',
-  ]
+  const handleImageError = (index) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }))
+  }
 
   const nextSlide = (e) => {
-    e.preventDefault()
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    if (business.images?.length > 0) {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % business.images.length)
+    }
   }
 
   const prevSlide = (e) => {
-    e.preventDefault()
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    )
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    if (business.images?.length > 0) {
+      setCurrentIndex(
+        (prevIndex) =>
+          (prevIndex - 1 + business.images.length) % business.images.length
+      )
+    }
+  }
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  const handleTouchMove = (e) => {
+    if (!touchStart) return
+    const touchEnd = e.touches[0].clientX
+    const diff = touchStart - touchEnd
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
+      setTouchStart(null)
+    }
   }
 
   useEffect(() => {
-    const interval = setInterval(
-      () => setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length),
-      5000
-    )
-    return () => clearInterval(interval)
-  }, [])
+    if (!isHovered && business.images?.length > 1) {
+      const interval = setInterval(nextSlide, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isHovered, business.images])
 
   if (isLoading) {
     return <SkeletonLoader />
   }
 
   return (
-    <Link to={`/view-business/${business._id}`}>
-      <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
-        <div className='relative w-full h-48 sm:h-64 overflow-hidden'>
-          {images.map((image, index) => (
+    <Link to={`/view-business/${business._id}`} className='block'>
+      <div
+        className='bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group max-w-sm mx-auto h-[400px] flex flex-col'
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div
+          className='relative w-full h-52 overflow-hidden'
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+        >
+          <div className='absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10'></div>
+
+          {business.images?.map((image, index) => (
             <div
               key={index}
-              className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ease-in-out ${
-                index === currentIndex ? 'opacity-100' : 'opacity-0'
+              className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                index === currentIndex
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-105'
               }`}
             >
-              <img
-                src={image}
-                alt={`${business.name} - Image ${index + 1}`}
-                className='w-full h-full object-cover'
-                onError={(e) => {
-                  console.error('Image failed to load:', image)
-                  setImageErrors((prev) => ({ ...prev, [index]: true }))
-                  e.target.onerror = null
-                  e.target.src = '/api/placeholder/400/300'
-                }}
-              />
-              {imageErrors[index] && (
-                <div className='absolute inset-0 bg-red-100 flex items-center justify-center'>
-                  <AlertCircle className='text-red-500 mr-2' />
-                  <span className='text-red-500'>Image failed to load</span>
-                </div>
+              {!imageErrors[index] ? (
+                <img
+                  src={image}
+                  alt={`${business.name} - Image ${index + 1}`}
+                  className='w-full h-full object-cover'
+                  onError={() => handleImageError(index)}
+                />
+              ) : (
+                <img
+                  src='https://client.bisstek.com/assets/img/blog/AI5.jpg'
+                  alt='Fallback'
+                  className='w-full h-full object-cover'
+                />
               )}
             </div>
           ))}
-          <button
-            onClick={prevSlide}
-            className='absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 rounded-full p-1 transition-colors duration-300'
-          >
-            <ChevronLeft className='w-4 h-4 text-white' />
-          </button>
-          <button
-            onClick={nextSlide}
-            className='absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 rounded-full p-1 transition-colors duration-300'
-          >
-            <ChevronRight className='w-4 h-4 text-white' />
-          </button>
+
+          {business.images?.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className='absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-1.5 rounded-full shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 md:block hidden'
+                aria-label='Previous image'
+              >
+                <ChevronLeft className='w-4 h-4 text-gray-800' />
+              </button>
+              <button
+                onClick={nextSlide}
+                className='absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-1.5 rounded-full shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 md:block hidden'
+                aria-label='Next image'
+              >
+                <ChevronRight className='w-4 h-4 text-gray-800' />
+              </button>
+            </>
+          )}
+
+          {business.images?.length > 1 && (
+            <div className='absolute top-2 right-2 z-20 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs backdrop-blur-sm'>
+              {currentIndex + 1} / {business.images.length}
+            </div>
+          )}
+
+          {business.images?.length > 1 && (
+            <div className='absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-20'>
+              {business.images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setCurrentIndex(index)
+                  }}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                    index === currentIndex
+                      ? 'bg-white scale-110'
+                      : 'bg-white/60 hover:bg-white/80'
+                  }`}
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className='p-4 space-y-2'>
-          <h2 className='text-xl font-semibold'>{business.name}</h2>
-          <p className='text-sm text-gray-600'>{business.type}</p>
+        <div className='p-4 flex-1 flex flex-col'>
+          <div className='flex justify-between items-start mb-2'>
+            <div>
+              <h2 className='text-lg font-semibold text-gray-800 line-clamp-1'>
+                {business.name}
+              </h2>
+              <p className='text-sm text-gray-600 line-clamp-1'>
+                {business.type}
+              </p>
+            </div>
+            <div className='flex items-center bg-green-50 px-2 py-0.5 rounded-full'>
+              <Star className='w-3 h-3 text-yellow-500 mr-1' />
+              <span className='text-xs font-medium text-gray-700'>4.5</span>
+            </div>
+          </div>
 
-          <div className='flex items-center text-sm'>
-            <MapPin className='w-4 h-4 mr-1 text-gray-500' />
-            <span>{`${business.address.city}, ${business.address.state}`}</span>
+          <div className='flex items-center text-sm text-gray-600 mb-2'>
+            <MapPin className='w-4 h-4 mr-1 text-gray-500 flex-shrink-0' />
+            <span className='line-clamp-1'>{`${business.address.city}, ${business.address.state}`}</span>
           </div>
 
           {business.tags && business.tags.length > 0 && (
-            <div className='flex flex-wrap gap-1'>
+            <div className='flex flex-wrap gap-1 mb-2'>
               {business.tags.slice(0, 3).map((tag, index) => (
                 <span
                   key={index}
-                  className='bg-gray-200 px-2 py-1 rounded-full text-xs flex items-center'
+                  className='bg-gray-50 px-2 py-0.5 rounded-full text-xs text-gray-600 flex items-center'
                 >
-                  <Tag className='w-3 h-3 mr-1' />
+                  <Tag className='w-3 h-3 mr-1 text-gray-400' />
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          <div className='flex justify-between items-center'>
+          <div className='flex justify-between items-center mt-auto pt-2 border-t border-gray-100'>
             {business.websiteUrl && (
               <a
                 href={business.websiteUrl}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-600 hover:underline text-sm flex items-center'
+                className='flex items-center text-blue-600 hover:text-blue-700 text-sm'
                 onClick={(e) => e.stopPropagation()}
               >
                 <Globe className='w-4 h-4 mr-1' />
@@ -147,10 +224,14 @@ const CustomSlider = ({ business, isLoading }) => {
               </a>
             )}
             {business.phoneNumber && (
-              <span className='text-sm flex items-center'>
-                <Phone className='w-4 h-4 mr-1 text-gray-500' />
+              <a
+                href={`tel:${business.phoneNumber}`}
+                className='flex items-center text-gray-600 hover:text-gray-800 text-sm'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Phone className='w-4 h-4 mr-1' />
                 {business.phoneNumber}
-              </span>
+              </a>
             )}
           </div>
         </div>

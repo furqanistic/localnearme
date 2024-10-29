@@ -1,8 +1,10 @@
 import Footer from '@/components/Layout/Footer'
 import NavBar from '@/components/Layout/NavigationBar'
 import { axiosInstance } from '@/config'
+import { loginFailure, loginStart, loginSuccess } from '@/redux/userSlice'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
 const Login = () => {
@@ -11,16 +13,19 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    dispatch(loginStart())
 
     try {
       const response = await axiosInstance.post('auth/signin', {
         email,
         password,
       })
+      dispatch(loginSuccess(response.data))
 
       // Assuming the API returns a token or user data upon successful login
       const { token, user } = response.data
@@ -32,6 +37,7 @@ const Login = () => {
       navigate('/')
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login')
+      dispatch(loginFailure(err.response?.data?.message))
     }
   }
 
