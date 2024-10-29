@@ -60,7 +60,7 @@ const Navigationbar = () => {
   const [language, setLanguage] = useState('English')
   const dropdownRef = useRef(null)
   const { currentUser } = useSelector((state) => state.user)
-  const activeUser = currentUser.data.user
+  const activeUser = currentUser?.data?.user || null
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -159,7 +159,7 @@ const Navigationbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     // Early return with loading state if user data isn't available yet
-    if (!currentUser) {
+    if (!activeUser) {
       return (
         <div className='relative group'>
           <div className='flex items-center space-x-3 text-sm font-medium text-gray-300'>
@@ -337,7 +337,7 @@ const Navigationbar = () => {
                 ))}
               </div>
             </div>
-            {currentUser ? (
+            {activeUser ? (
               <UserMenu />
             ) : (
               <>
