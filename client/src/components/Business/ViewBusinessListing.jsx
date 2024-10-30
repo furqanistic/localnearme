@@ -16,14 +16,113 @@ import {
   Tag,
 } from 'lucide-react'
 import { useState } from 'react'
-import { useQuery } from 'react-query'
-import { useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useNavigate, useParams } from 'react-router-dom'
 import Loader from '../utils/Loader'
 
 const ViewBusinessListing = ({ business }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const queryClient = useQueryClient()
   const param = useParams()
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const navigate = useNavigate()
+
+  // Check subscription status
+  const { data: subscriptionStatus, isLoading: checkingSubscription } =
+    useQuery(
+      ['subscription', business._id],
+      async () => {
+        try {
+          const response = await axiosInstance.get(
+            `/subscriptions/my-subscriptions`
+          )
+          return response.data.data.subscriptions.some(
+            (sub) => sub.business._id === business._id
+          )
+        } catch (error) {
+          if (error.response?.status === 401) {
+            navigate('/login')
+          }
+          throw error
+        }
+      },
+      {
+        enabled: !!business._id,
+        retry: 1,
+        onError: (error) => {
+          console.error('Error checking subscription:', error)
+          toast.error('Unable to check subscription status')
+        },
+      }
+    )
+
+  // Subscribe mutation
+  const subscribeMutation = useMutation(
+    async () => {
+      const response = await axiosInstance.post(
+        `/subscriptions/businesses/${business._id}/subscribe`
+      )
+      return response.data
+    },
+    {
+      onSuccess: (data) => {
+        toast.success('Successfully subscribed to business')
+        queryClient.invalidateQueries(['subscription', business._id])
+        queryClient.invalidateQueries(['business', business._id])
+      },
+      onError: (error) => {
+        if (error.response?.status === 401) {
+          navigate('/login')
+          toast.error('Please login to subscribe')
+        } else {
+          toast.error(error.response?.data?.message || 'Failed to subscribe')
+        }
+      },
+    }
+  )
+
+  // Unsubscribe mutation
+  const unsubscribeMutation = useMutation(
+    async () => {
+      const response = await axiosInstance.post(
+        `/subscriptions/businesses/${business._id}/unsubscribe`
+      )
+      return response.data
+    },
+    {
+      onSuccess: (data) => {
+        toast.success('Successfully unsubscribed from business')
+        queryClient.invalidateQueries(['subscription', business._id])
+        queryClient.invalidateQueries(['business', business._id])
+      },
+      onError: (error) => {
+        if (error.response?.status === 401) {
+          navigate('/login')
+          toast.error('Please login to manage subscriptions')
+        } else {
+          toast.error(error.response?.data?.message || 'Failed to unsubscribe')
+        }
+      },
+    }
+  )
+
+  const handleSubscribe = async () => {
+    try {
+      if (subscriptionStatus) {
+        unsubscribeMutation.mutate()
+      } else {
+        subscribeMutation.mutate()
+      }
+    } catch (error) {
+      console.error('Subscription error:', error)
+    }
+  }
+
+  if (checkingSubscription) {
+    return <Loader />
+  }
+
   const nextImage = () => {
     setCurrentImageIndex(
       (prevIndex) => (prevIndex + 1) % business.images.length
@@ -35,11 +134,6 @@ const ViewBusinessListing = ({ business }) => {
       (prevIndex) =>
         (prevIndex - 1 + business.images.length) % business.images.length
     )
-  }
-
-  const handleSubscribe = () => {
-    setIsSubscribed(!isSubscribed)
-    // Here you would typically make an API call to update the subscription status
   }
 
   return (
@@ -243,18 +337,50 @@ const ViewBusinessListing = ({ business }) => {
             </div>
 
             {/* Action Buttons */}
+            {/* Action Buttons */}
             <div className='space-y-4'>
               <button
                 onClick={handleSubscribe}
-                className={`w-full py-3 px-6 rounded-xl flex items-center justify-center transition-colors duration-300 ${
-                  isSubscribed
+                disabled={
+                  subscribeMutation.isLoading || unsubscribeMutation.isLoading
+                }
+                className={`w-full py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                  subscriptionStatus
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-blue-600 hover:bg-blue-700'
+                } ${
+                  subscribeMutation.isLoading || unsubscribeMutation.isLoading
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:scale-105 transform'
                 }`}
               >
-                <Bell className='w-5 h-5 mr-3' />
-                {isSubscribed ? 'Subscribed' : 'Subscribe'}
+                {subscribeMutation.isLoading ||
+                unsubscribeMutation.isLoading ? (
+                  <div className='flex items-center space-x-2'>
+                    <div className='w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin' />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Bell
+                      className={`w-5 h-5 mr-2 ${
+                        subscriptionStatus ? 'animate-ring' : ''
+                      }`}
+                    />
+                    {subscriptionStatus ? 'Unsubscribe' : 'Subscribe'}
+                  </>
+                )}
               </button>
+
+              {/* Subscription Status Indicator */}
+              {subscriptionStatus && (
+                <div className='bg-green-600/20 p-4 rounded-xl'>
+                  <p className='text-green-400 flex items-center'>
+                    <Bell className='w-5 h-5 mr-2' />
+                    You're subscribed
+                  </p>
+                </div>
+              )}
               <button className='w-full bg-pink-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-pink-700 transition-colors duration-300'>
                 <Heart className='w-5 h-5 mr-3' />
                 Add to Favorites

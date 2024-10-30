@@ -1,6 +1,7 @@
 import { logout } from '@/redux/userSlice'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
+  Bookmark,
   BookOpen,
   Calendar,
   ChevronDown,
@@ -15,7 +16,6 @@ import {
   MapPin,
   Menu,
   Search,
-  Settings,
   Shield,
   ShoppingBag,
   User,
@@ -226,22 +226,20 @@ const Navigationbar = () => {
             >
               <User className='mr-3 h-5 w-5 text-gray-400 group-hover:text-indigo-600' />
               <div>
-                <p className='font-medium'>Your Profile</p>
-                <p className='text-xs text-gray-500'>
-                  Manage your account details
-                </p>
+                <p className='font-medium'>Profile & Settings</p>
+                <p className='text-xs text-gray-500'>Manage your account</p>
               </div>
             </Link>
 
             <Link
-              to='/settings'
+              to='/collections'
               className='group flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50'
             >
-              <Settings className='mr-3 h-5 w-5 text-gray-400 group-hover:text-indigo-600' />
+              <Bookmark className='mr-3 h-5 w-5 text-gray-400 group-hover:text-indigo-600' />
               <div>
-                <p className='font-medium'>Settings</p>
+                <p className='font-medium'>Collections</p>
                 <p className='text-xs text-gray-500'>
-                  Customize your preferences
+                  Subscription & Favourites
                 </p>
               </div>
             </Link>
