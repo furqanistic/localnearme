@@ -50,7 +50,7 @@ function App() {
             <Route path='/business/:id' element={<BusinessFormPage />} />
             <Route path='/business/add' element={<BusinessFormPage />} />
             <Route path='/business/edit/:id' element={<BusinessFormPage />} />
-            <Route path='/users' element={<SubscribersPage />} />
+            <Route path='/subscribers' element={<SubscribersPage />} />
             <Route path='/myfeed' element={<MyFeed />} />
             <Route path='/sales' element={<FlyerPage />} />
             <Route path='/subscribed-flyers' element={<SubscribedFlyers />} />

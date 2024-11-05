@@ -119,6 +119,65 @@ export const getAllBusinesses = async (req, res, next) => {
   }
 }
 
+export const getUserBusinesses = async (req, res, next) => {
+  try {
+    // Get user ID either from params (if admin) or from authenticated user
+    const userId = req.params.userId || req.user.id
+
+    // If trying to access other user's businesses, check if admin
+    if (req.params.userId && req.user.role !== 'Admin') {
+      return next(createError(403, 'You can only view your own businesses'))
+    }
+
+    const businesses = await Business.find({ owner: userId }).populate({
+      path: 'owner',
+      select: 'name email businessName', // Select fields you want to include
+    })
+
+    res.status(200).json({
+      status: 'success',
+      results: businesses.length,
+      data: {
+        businesses,
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// Controller function to get only business names
+export const getBusinessNames = async (req, res, next) => {
+  try {
+    // Get user ID either from params (if admin) or from authenticated user
+    const userId = req.params.userId || req.user.id
+
+    // If trying to access other user's businesses, check if admin
+    if (req.params.userId && req.user.role !== 'Admin') {
+      return next(createError(403, 'You can only view your own businesses'))
+    }
+
+    // Only fetch the 'name' field from businesses
+    const businesses = await Business.find({ owner: userId })
+      .select('name')
+      .lean()
+
+    // Transform the data to a format suitable for dropdowns
+    const businessNames = businesses.map((business) => ({
+      value: business._id,
+      label: business.name,
+    }))
+
+    res.status(200).json({
+      status: 'success',
+      results: businessNames.length,
+      data: businessNames,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const sendDigitalFlyer = async (req, res, next) => {
   try {
     const business = await Business.findById(req.params.id)

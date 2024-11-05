@@ -1,4 +1,5 @@
 import { axiosInstance } from '@/config'
+import LoginRequiredModal from '@/Pages/Auth/LoginRequiredModal'
 import {
   Award,
   Bell,
@@ -18,15 +19,17 @@ import {
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Loader from '../utils/Loader'
 
 const ViewBusinessListing = ({ business }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const queryClient = useQueryClient()
   const param = useParams()
-  const [isSubscribed, setIsSubscribed] = useState(false)
   const navigate = useNavigate()
+  const { currentUser } = useSelector((state) => state.user)
 
   // Check subscription status
   const { data: subscriptionStatus, isLoading: checkingSubscription } =
@@ -42,14 +45,18 @@ const ViewBusinessListing = ({ business }) => {
           )
         } catch (error) {
           if (error.response?.status === 401) {
-            navigate('/login')
+            // Don't navigate to login page on 401, just return false
+            return false
           }
           throw error
         }
       },
       {
-        enabled: !!business._id,
+        // Only enable the query if we have both a business ID and a logged-in user
+        enabled: !!business._id && !!currentUser,
         retry: 1,
+        // Initialize with false when disabled
+        initialData: false,
         onError: (error) => {
           console.error('Error checking subscription:', error)
           toast.error('Unable to check subscription status')
@@ -108,6 +115,11 @@ const ViewBusinessListing = ({ business }) => {
   )
 
   const handleSubscribe = async () => {
+    if (!currentUser) {
+      setShowLoginModal(true)
+      return
+    }
+
     try {
       if (subscriptionStatus) {
         unsubscribeMutation.mutate()
@@ -117,6 +129,22 @@ const ViewBusinessListing = ({ business }) => {
     } catch (error) {
       console.error('Subscription error:', error)
     }
+  }
+
+  const handleFavorite = () => {
+    if (!currentUser) {
+      setShowLoginModal(true)
+      return
+    }
+    // Add favorite logic here
+  }
+
+  const handleReview = () => {
+    if (!currentUser) {
+      setShowLoginModal(true)
+      return
+    }
+    // Add review logic here
   }
 
   if (checkingSubscription) {
@@ -345,13 +373,9 @@ const ViewBusinessListing = ({ business }) => {
                   subscribeMutation.isLoading || unsubscribeMutation.isLoading
                 }
                 className={`w-full py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                  subscriptionStatus
+                  subscriptionStatus && currentUser
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-blue-600 hover:bg-blue-700'
-                } ${
-                  subscribeMutation.isLoading || unsubscribeMutation.isLoading
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:scale-105 transform'
                 }`}
               >
                 {subscribeMutation.isLoading ||
@@ -364,16 +388,18 @@ const ViewBusinessListing = ({ business }) => {
                   <>
                     <Bell
                       className={`w-5 h-5 mr-2 ${
-                        subscriptionStatus ? 'animate-ring' : ''
+                        subscriptionStatus && currentUser ? 'animate-ring' : ''
                       }`}
                     />
-                    {subscriptionStatus ? 'Unsubscribe' : 'Subscribe'}
+                    {subscriptionStatus && currentUser
+                      ? 'Unsubscribe'
+                      : 'Subscribe'}
                   </>
                 )}
               </button>
 
               {/* Subscription Status Indicator */}
-              {subscriptionStatus && (
+              {subscriptionStatus && currentUser && (
                 <div className='bg-green-600/20 p-4 rounded-xl'>
                   <p className='text-green-400 flex items-center'>
                     <Bell className='w-5 h-5 mr-2' />
@@ -381,7 +407,10 @@ const ViewBusinessListing = ({ business }) => {
                   </p>
                 </div>
               )}
-              <button className='w-full bg-pink-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-pink-700 transition-colors duration-300'>
+              <button
+                onClick={handleFavorite}
+                className='w-full bg-pink-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-pink-700 transition-colors duration-300'
+              >
                 <Heart className='w-5 h-5 mr-3' />
                 Add to Favorites
               </button>
@@ -401,7 +430,10 @@ const ViewBusinessListing = ({ business }) => {
                 </a>
               )}
               {business.reviewSystem && business.reviewSystem.isActive && (
-                <button className='w-full bg-green-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-green-700 transition-colors duration-300'>
+                <button
+                  onClick={handleReview}
+                  className='w-full bg-green-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-green-700 transition-colors duration-300'
+                >
                   <MessageCircle className='w-5 h-5 mr-3' />
                   Leave a Review
                 </button>
@@ -410,6 +442,10 @@ const ViewBusinessListing = ({ business }) => {
           </div>
         </div>
       </div>
+      <LoginRequiredModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
     </div>
   )
 }

@@ -80,12 +80,8 @@ export const verifyToken = async (req, res, next) => {
 
 export const restrictTo = (...allowedRoles) => {
   return (req, res, next) => {
-    console.log('User object:', req.user)
-    console.log('Allowed roles:', allowedRoles)
-
     // Check if user exists and has a role
     if (!req.user || !req.user.role) {
-      console.log('No user or role found')
       return res.status(401).json({
         status: 'fail',
         message:
@@ -93,18 +89,14 @@ export const restrictTo = (...allowedRoles) => {
       })
     }
 
-    console.log('User role:', req.user.role)
-
     // Check if user's role is allowed
     if (!allowedRoles.includes(req.user.role)) {
-      console.log('User role not in allowed roles')
       return res.status(403).json({
         status: 'fail',
         message: '`You do not have permission to perform this action`',
       })
     }
 
-    console.log('Access granted')
     next()
   }
 }

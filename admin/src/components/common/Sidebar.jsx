@@ -42,7 +42,7 @@ const SIDEBAR_ITEMS = [
     name: 'Subscribers',
     icon: UserRoundCheck,
     color: '#EC4899',
-    href: '/users',
+    href: '/subscribers',
   },
   {
     name: 'Subscribed Flyers',

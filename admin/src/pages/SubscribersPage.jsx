@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion'
 import { UserCheck, UserPlus, UsersIcon, UserX } from 'lucide-react'
-
+import { useQuery } from 'react-query'
 import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 import SubscribersTable from '../components/users/SubscribersTable'
 import UserActivityHeatmap from '../components/users/UserActivityHeatmap'
 import UserDemographicsChart from '../components/users/UserDemographicsChart'
 import UserGrowthChart from '../components/users/UserGrowthChart'
+import { axiosInstance } from '../config.js'
+import { useSelector } from 'react-redux'
 
 const userStats = {
   totalUsers: 152845,
@@ -15,7 +17,27 @@ const userStats = {
   churnRate: '2.4%',
 }
 
+const fetchBusinessLocations = async (businessOwnerId) => {
+  const response = await axiosInstance.get(
+    `business/user/${businessOwnerId}/business-names`
+  )
+  return response
+}
+
 const SubscribersPage = () => {
+  const { currentUser } = useSelector((state) => state.user)
+  const activeUser = currentUser?.data?.user
+  // Fetch business locations
+  const {
+    data: businesses = [],
+    isLoading: isLoadingBusinesses,
+    error: businessesError,
+  } = useQuery({
+    queryKey: ['businesses-count', activeUser?._id],
+    queryFn: () => fetchBusinessLocations(activeUser?._id),
+    enabled: !!activeUser?._id,
+  })
+
   return (
     <div className='flex-1 overflow-auto relative z-10'>
       <Header title='Subscribers' />
@@ -29,9 +51,9 @@ const SubscribersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name='Total Users'
+            name='Total Subscribers'
             icon={UsersIcon}
-            value={userStats.totalUsers.toLocaleString()}
+            value={businesses?.data?.results.toLocaleString() || '0'}
             color='#6366F1'
           />
           <StatCard
