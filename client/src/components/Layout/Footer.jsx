@@ -47,7 +47,11 @@ const Footer = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-12 border-b border-gray-800'>
           {/* Company Info */}
           <div className='lg:col-span-4'>
-            <img src='/logoicon.png' alt='Logo' className='h-8 w-auto mb-6' />
+            <img
+              src='https://dashboard.bisslocal.com/weblogo.png'
+              alt='Logo'
+              className='h-8 w-auto mb-6'
+            />
             <p className='text-gray-400 text-sm mb-6'>
               Discover and connect with the best local businesses in your area.
               From restaurants to services, find everything you need nearby.
@@ -161,14 +165,14 @@ const Footer = () => {
             </p>
             <div className='flex space-x-4 text-sm text-gray-400'>
               <a
-                href='#'
+                href='/privacy'
                 className='hover:text-white transition-colors duration-200'
               >
                 Privacy Policy
               </a>
               <span>·</span>
               <a
-                href='#'
+                href='/terms'
                 className='hover:text-white transition-colors duration-200'
               >
                 Terms of Service

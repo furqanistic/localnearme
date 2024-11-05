@@ -8,6 +8,8 @@ import Home from './Pages/Home/Home'
 import ProfilePage from './Pages/Home/ProfilePage'
 import UserCollections from './Pages/Home/UserCollections'
 import LocalGuidePage from './Pages/More/LocalGuidePage'
+import PrivacyPolicy from './Pages/More/PrivacyPolicy'
+import TermsOfUse from './Pages/More/TermsOfUse'
 import TrendingPage from './Pages/More/TrendingPage'
 
 const App = () => {
@@ -24,6 +26,8 @@ const App = () => {
           <Route path='/about' element={<AboutUs />} />
           <Route path='/local-guide' element={<LocalGuidePage />} />
           <Route path='/trending' element={<TrendingPage />} />
+          <Route path='/privacy' element={<PrivacyPolicy />} />
+          <Route path='/terms' element={<TermsOfUse />} />
           <Route path='*' element={<Error404 />} />
         </Routes>
       </BrowserRouter>
