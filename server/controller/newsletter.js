@@ -5,8 +5,8 @@ import Newsletter from '../models/Newsletter.js'
 import Subscription from '../models/Subscription.js'
 
 const mg = mailgun({
-  apiKey: 'e7996d90b21b9f5e2f58641638c7c421-79295dd0-f99b6f29',
-  domain: 'sandboxc53e86125c274a9f8b71a6cd2cd2371e.mailgun.org',
+  apiKey: process.env.MAILGUN_API_KEY,
+  domain: process.env.MAILGUN_DOMAIN,
 })
 
 export const sendNewsletter = async (req, res, next) => {
@@ -136,9 +136,9 @@ export const sendNewsletter = async (req, res, next) => {
         </html>
       `
 
-      // Send individual email with modified from address
+      // Send individual email
       const emailData = {
-        from: `${business.name} <mailgun@sandboxc53e86125c274a9f8b71a6cd2cd2371e.mailgun.org>`,
+        from: `${business.name} <newsletters@${process.env.MAILGUN_DOMAIN}>`,
         to: subscriber.email,
         subject: personalizedSubject,
         html: emailHTML,
@@ -151,27 +151,15 @@ export const sendNewsletter = async (req, res, next) => {
     // Wait for all emails to be sent
     await Promise.all(sendPromises)
 
-    // Log newsletter activity with findOneAndUpdate
-    await Newsletter.findOneAndUpdate(
-      {
-        email: business.owner.email,
-        name: business.name,
-      },
-      {
-        email: business.owner.email,
-        name: business.name,
-        subscriptionType: 'Business',
-        subscriptions: [business._id],
-        isSubscribedToMain: true,
-        preferences: new Map([['newsletters', true]]),
-        lastSentAt: new Date(),
-      },
-      {
-        upsert: true,
-        new: true,
-        setDefaultsOnInsert: true,
-      }
-    )
+    // Log newsletter activity
+    await Newsletter.create({
+      email: business.owner.email,
+      name: business.name,
+      subscriptionType: 'Business',
+      subscriptions: [business._id],
+      isSubscribedToMain: true,
+      preferences: new Map([['newsletters', true]]),
+    })
 
     res.status(200).json({
       status: 'success',
