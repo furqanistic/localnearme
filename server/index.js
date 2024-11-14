@@ -5,6 +5,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import authRoute from './routes/auth.js'
 import businessRoute from './routes/business.js'
+import newsletterRoutes from './routes/newsLetter.js'
 import subscriptionRoutes from './routes/subscription.js'
 
 const app = express()
@@ -59,6 +60,7 @@ app.use((req, res, next) => {
 app.use('/api/auth/', authRoute)
 app.use('/api/business/', businessRoute)
 app.use('/api/subscriptions/', subscriptionRoutes)
+app.use('/api/newsletter/', newsletterRoutes)
 
 const connect = () => {
   mongoose

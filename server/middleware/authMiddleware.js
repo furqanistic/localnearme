@@ -55,7 +55,6 @@ export const verifyToken = async (req, res, next) => {
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt
     }
-
     if (!token) {
       return next(
         createError(401, 'You are not logged in! Please log in to get access.')
