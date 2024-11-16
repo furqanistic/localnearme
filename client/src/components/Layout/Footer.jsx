@@ -161,7 +161,7 @@ const Footer = () => {
         <div className='pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
           <div className='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8'>
             <p className='text-gray-400 text-sm'>
-              © {new Date().getFullYear()} localnearme. All rights reserved.
+              © {new Date().getFullYear()} bisslocal. All rights reserved.
             </p>
             <div className='flex space-x-4 text-sm text-gray-400'>
               <a
@@ -189,11 +189,11 @@ const Footer = () => {
               (123) 456-7890
             </a>
             <a
-              href='mailto:info@localnearme.com'
+              href='mailto:info@bisslocal.com'
               className='text-gray-400 hover:text-white text-sm flex items-center transition-colors duration-200'
             >
               <Mail className='h-4 w-4 mr-2' />
-              info@localnearme.com
+              info@bisslocal.com
             </a>
           </div>
         </div>

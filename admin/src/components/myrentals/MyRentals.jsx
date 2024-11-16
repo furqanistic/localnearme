@@ -160,7 +160,7 @@ const MyRentals = () => {
   }
 
   return (
-    <div className='bg-gray-900 min-h-screen'>
+    <div className='bg-gray-800 bg-opacity-50 min-h-screen'>
       <div className='container mx-auto px-4 py-8'>
         <div className='flex justify-between items-center mb-8'>
           <h1 className='text-3xl font-bold text-white'>My Rentals</h1>
@@ -182,7 +182,7 @@ const MyRentals = () => {
             {rentals.map((rental) => (
               <motion.div
                 key={rental.id}
-                className='bg-gray-800 rounded-lg overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105'
+                className='bg-gray-900 rounded-lg overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105'
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}

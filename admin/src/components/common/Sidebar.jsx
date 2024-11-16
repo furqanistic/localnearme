@@ -2,14 +2,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   BarChart2,
   Building2,
+  ChevronLeft,
   DoorOpen,
   Flame,
   HandHelping,
-  LogIn,
-  LogOut,
   MailCheck,
   MapPinned,
-  Menu,
   PanelsTopLeft,
   ScanEye,
   Settings,
@@ -50,7 +48,12 @@ const SIDEBAR_ITEMS = [
     color: '#48e1ec',
     href: '/subscribed-flyers',
   },
-  { name: 'Digital Flyer', icon: SquareMenu, color: '#10B981', href: '/sales' },
+  {
+    name: 'Digital Flyer',
+    icon: SquareMenu,
+    color: '#10B981',
+    href: '/sales',
+  },
   {
     name: 'Review Filter',
     icon: ScanEye,
@@ -81,12 +84,18 @@ const SIDEBAR_ITEMS = [
     color: '#3B82F6',
     href: '/Membership',
   },
-  { name: 'Settings', icon: Settings, color: '#6EE7B7', href: '/settings' },
+  {
+    name: 'Settings',
+    icon: Settings,
+    color: '#6EE7B7',
+    href: '/settings',
+  },
 ]
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeItem, setActiveItem] = useState('/')
   const scrollContainerRef = useRef(null)
 
   useEffect(() => {
@@ -104,81 +113,111 @@ const Sidebar = () => {
     }
   }
 
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0
-    }
-  }, [isSidebarOpen])
-
   const isCollapsed = !isSidebarOpen || isMobile
 
   return (
-    <motion.div
-      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
-        isCollapsed ? 'w-20' : 'w-64'
+    <div
+      className={`relative z-10 flex-shrink-0 h-screen transition-[width] duration-200 ease-in-out ${
+        isCollapsed ? 'w-20' : 'w-60'
       }`}
-      animate={{ width: isCollapsed ? 80 : 256 }}
     >
-      <div className='h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700'>
-        <div className='flex flex-col items-center mb-8'>
-          <motion.img
-            src='weblogo.png'
-            alt='Logo'
-            className='w-34 h-34 object-contain mb-4 bg-blue-400 p-1 rounded'
-            animate={{
-              width: isCollapsed ? 48 : 64,
-              height: isCollapsed ? 48 : 64,
-            }}
-          />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+      <div className='h-full bg-gray-800 backdrop-blur-lg flex flex-col border-r border-gray-800/50 shadow-xl'>
+        {/* Logo Section */}
+        <div className='flex flex-col items-center py-5 border-b border-gray-800/50 relative'>
+          <div className='relative bg-purple-200 p-1 rounded'>
+            <img
+              src='weblogo.png'
+              alt='Logo'
+              className={`object-contain rounded-xl transition-all duration-200 ${
+                isCollapsed ? 'w-11 h-11' : 'w-12 h-12'
+              }`}
+            />
+          </div>
+
+          <button
             onClick={toggleSidebar}
-            className={`p-2 rounded-full hover:bg-gray-700 transition-colors ${
-              isMobile ? 'pointer-events-none' : ''
+            className={`absolute -right-2.5 top-6 p-1.5 rounded-full bg-gray-800/90 border border-gray-700/50 shadow-lg hover:bg-gray-900 transition-colors ${
+              isMobile ? 'pointer-events-none opacity-0' : ''
             }`}
           >
-            <Menu size={24} />
-          </motion.button>
+            <ChevronLeft
+              size={14}
+              className={`transform transition-transform duration-200 ${
+                !isCollapsed ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
         </div>
+
+        {/* Navigation Section */}
         <nav
           ref={scrollContainerRef}
-          className={`flex-grow ${
-            isCollapsed ? 'overflow-y-auto' : 'overflow-y-auto'
-          }`}
+          className='flex-grow overflow-y-auto overflow-x-hidden py-3 px-2'
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#4B5563 transparent',
+          }}
         >
-          <div className={`flex flex-col`}>
+          <div className='space-y-0.5'>
             {SIDEBAR_ITEMS.map((item) => (
-              <Link key={item.href} to={item.href} className='w-full'>
-                <motion.div
-                  className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 ${
-                    isCollapsed ? 'justify-center' : ''
-                  }`}
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={() => setActiveItem(item.href)}
+                className='block'
+              >
+                <div
+                  className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 group relative ${
+                    activeItem === item.href
+                      ? 'bg-gray-900/80'
+                      : 'hover:bg-gray-900/40'
+                  } ${!isCollapsed ? 'hover:translate-x-1' : ''}`}
                 >
-                  <item.icon
-                    size={20}
-                    style={{ color: item.color, minWidth: '20px' }}
+                  {/* Active Indicator */}
+                  <div
+                    className={`absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4/6 rounded-full transition-all duration-200 ${
+                      activeItem === item.href
+                        ? 'bg-blue-500'
+                        : 'bg-transparent group-hover:bg-gray-900'
+                    }`}
                   />
-                  <AnimatePresence>
+
+                  {/* Content */}
+                  <div className='flex items-center gap-3 min-w-0'>
+                    <div
+                      className={`relative rounded-md p-1.5 transition-colors duration-200 ${
+                        activeItem === item.href ? 'bg-gray-900/50' : ''
+                      }`}
+                    >
+                      <item.icon
+                        size={16}
+                        className='flex-shrink-0 transition-colors duration-200'
+                        style={{
+                          color: activeItem === item.href ? '#fff' : item.color,
+                          opacity: activeItem === item.href ? 1 : 0.8,
+                        }}
+                      />
+                    </div>
+
                     {!isCollapsed && (
-                      <motion.span
-                        className='ml-4 whitespace-nowrap'
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: 'auto' }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2, delay: 0.3 }}
+                      <span
+                        className={`truncate text-sm font-medium transition-colors duration-200 ${
+                          activeItem === item.href
+                            ? 'text-gray-100'
+                            : 'text-gray-400'
+                        }`}
                       >
                         {item.name}
-                      </motion.span>
+                      </span>
                     )}
-                  </AnimatePresence>
-                </motion.div>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
         </nav>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

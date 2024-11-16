@@ -450,7 +450,7 @@ const DigitalFlyerForm = () => {
       }, 300)
 
       const response = await axiosInstance.post(
-        `/newsletter/businesses/${selectedBusiness.value}/newsletter`,
+        `/newsletter/businesses/${selectedBusiness.value}/newsletters`,
         newsletterData,
         {
           headers: {

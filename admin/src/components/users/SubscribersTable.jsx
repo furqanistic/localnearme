@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from 'react-query'
 import { useSelector } from 'react-redux'
 import { axiosInstance } from '../../config'
+import SearchableDropdown from './SearchableDropdown'
 
 const ITEMS_PER_PAGE = 5
 
@@ -11,15 +12,15 @@ const fetchBusinessLocations = async (businessOwnerId) => {
   const response = await axiosInstance.get(
     `business/user/${businessOwnerId}/business-names`
   )
-  return response.data.data
+  return response.data.data || [] // Ensure we always return an array
 }
 
 const fetchSubscribers = async (businessId) => {
-  if (!businessId) return null
+  if (!businessId) return [] // Return empty array instead of null
   const response = await axiosInstance.get(
     `subscriptions/businesses/${businessId}/subscribers`
   )
-  return response.data.data.subscriptions
+  return response.data.data.subscriptions || [] // Ensure we always return an array
 }
 
 const SubscribersTable = () => {
@@ -42,7 +43,11 @@ const SubscribersTable = () => {
 
   // Set initial selected business when data is loaded
   useEffect(() => {
-    if (businesses.length > 0 && !selectedBusiness) {
+    if (
+      Array.isArray(businesses) &&
+      businesses.length > 0 &&
+      !selectedBusiness
+    ) {
       setSelectedBusiness(businesses[0])
     }
   }, [businesses])
@@ -102,7 +107,7 @@ const SubscribersTable = () => {
 
   return (
     <motion.div
-      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-4 md:p-6 border border-gray-700'
+      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-4 my-5 md:p-6 border border-gray-700'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -123,37 +128,14 @@ const SubscribersTable = () => {
               size={18}
             />
           </div>
-          <div className='relative'>
-            {isLoadingBusinesses ? (
-              <div className='w-full sm:w-48 bg-gray-700 text-gray-400 rounded-lg pl-4 pr-10 py-2'>
-                Loading...
-              </div>
-            ) : businessesError ? (
-              <div className='w-full sm:w-48 bg-gray-700 text-red-400 rounded-lg pl-4 pr-10 py-2'>
-                Error loading businesses
-              </div>
-            ) : businesses.length === 0 ? (
-              <div className='w-full sm:w-48 bg-gray-700 text-gray-400 rounded-lg pl-4 pr-10 py-2'>
-                No businesses found
-              </div>
-            ) : (
-              <select
-                className='w-full sm:w-48 appearance-none bg-gray-700 text-white rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                value={selectedBusiness?.label || ''}
-                onChange={handleBusinessChange}
-              >
-                {businesses.map((business) => (
-                  <option key={business.value} value={business.label}>
-                    {business.label}
-                  </option>
-                ))}
-              </select>
-            )}
-            <ChevronDown
-              className='absolute right-3 top-2.5 text-gray-400'
-              size={18}
-            />
-          </div>
+          <SearchableDropdown
+            options={businesses}
+            value={selectedBusiness}
+            onChange={setSelectedBusiness}
+            isLoading={isLoadingBusinesses}
+            error={businessesError}
+            placeholder='Select a business'
+          />
         </div>
       </div>
 

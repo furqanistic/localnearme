@@ -1,6 +1,6 @@
+// 2. Model file (Newsletters.js)
 import mongoose from 'mongoose'
-
-const NewsletterSchema = new mongoose.Schema(
+const NewslettersSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -33,5 +33,4 @@ const NewsletterSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
-
-export default mongoose.model('Newsletter', NewsletterSchema)
+export default mongoose.model('Newsletters', NewslettersSchema)

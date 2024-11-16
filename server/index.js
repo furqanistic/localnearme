@@ -5,7 +5,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import authRoute from './routes/auth.js'
 import businessRoute from './routes/business.js'
-import newsletterRoutes from './routes/newsLetter.js'
+import newsletterRoutes from './routes/newsLetters.js'
 import subscriptionRoutes from './routes/subscription.js'
 
 const app = express()
@@ -13,10 +13,10 @@ dotenv.config()
 
 const allowedOrigins = [
   process.env.NODE_ENV === 'production'
-    ? 'https://bisslocal.com'
-    : 'http://localhost:5173',
-  'https://dashboard.bisslocal.com',
-  'https://api.bisslocal.com',
+    ? process.env.MAIN_DOMAIN
+    : process.env.CLIENT_URL,
+  process.env.DASHBOARD_URL,
+  process.env.API_URL,
 ]
 
 app.use(cookieParser())

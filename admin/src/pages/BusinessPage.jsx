@@ -9,7 +9,7 @@ import BusinessTable from '../components/business/BusinessTable'
 import SalesTrendChart from '../components/business/SalesTrendChart'
 import CategoryDistributionChart from '../components/overview/CategoryDistributionChart'
 
-const ProductsPage = () => {
+const BusinessPage = () => {
   return (
     <div className='flex-1 overflow-auto relative z-10'>
       <Header title='Business' />
@@ -60,4 +60,4 @@ const ProductsPage = () => {
     </div>
   )
 }
-export default ProductsPage
+export default BusinessPage

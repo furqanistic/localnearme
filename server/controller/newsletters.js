@@ -1,15 +1,17 @@
+import dotenv from 'dotenv'
 import mailgun from 'mailgun-js'
+
 import { createError } from '../error.js'
 import Business from '../models/Business.js'
-import Newsletter from '../models/Newsletter.js'
+import Newsletters from '../models/Newsletters.js'
 import Subscription from '../models/Subscription.js'
-
+dotenv.config()
 const mg = mailgun({
   apiKey: process.env.MAILGUN_API_KEY,
   domain: process.env.MAILGUN_DOMAIN,
 })
 
-export const sendNewsletter = async (req, res, next) => {
+export const sendNewsletters = async (req, res, next) => {
   try {
     const { businessId } = req.params
     const { subject, message, templateId } = req.body
@@ -151,8 +153,8 @@ export const sendNewsletter = async (req, res, next) => {
     // Wait for all emails to be sent
     await Promise.all(sendPromises)
 
-    // Log newsletter activity
-    await Newsletter.create({
+    // Log newsletters activity
+    await Newsletters.create({
       email: business.owner.email,
       name: business.name,
       subscriptionType: 'Business',
@@ -163,11 +165,11 @@ export const sendNewsletter = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      message: 'Newsletter sent successfully',
+      message: 'Newsletters sent successfully',
       recipientCount: subscriptions.length,
     })
   } catch (error) {
-    console.error('Newsletter sending error:', error)
+    console.error('Newsletters sending error:', error)
     next(error)
   }
 }

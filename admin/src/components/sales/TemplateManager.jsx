@@ -8,29 +8,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
 import { cn } from '@/lib/utils'
-import {
-  AlertCircle,
-  Check,
-  ChevronsUpDown,
-  FilePlus,
-  Pencil,
-  Save,
-  Send,
-  Template,
-  Trash2,
-  Upload,
-  X,
-} from 'lucide-react'
+import { Check, FilePlus, Pencil, Save, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 // Template management component
