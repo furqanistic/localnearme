@@ -46,9 +46,9 @@ const MembershipPage = () => {
   const plans = [
     {
       id: 'starter',
-      name: 'Free',
+      name: 'Starter',
       description: 'Perfect for getting started',
-      price: 0,
+      price: 29.99,
       stripePriceId: import.meta.env.VITE_STRIPE_PRICE_STARTER,
       icon: Star,
       color: 'from-gray-400 to-gray-500',
@@ -61,9 +61,9 @@ const MembershipPage = () => {
     },
     {
       id: 'standard',
-      name: 'Basic',
+      name: 'Standard',
       description: 'Great for growing businesses',
-      price: 19.99,
+      price: 69.99,
       stripePriceId: import.meta.env.VITE_STRIPE_PRICE_STANDARD,
       icon: Zap,
       color: 'from-blue-400 to-blue-500',
@@ -78,10 +78,10 @@ const MembershipPage = () => {
       ],
     },
     {
-      id: 'business',
+      id: 'Big Business',
       name: 'Pro',
       description: 'For power users and teams',
-      price: 49.99,
+      price: 99.99,
       stripePriceId: import.meta.env.VITE_STRIPE_PRICE_BUSINESS,
       icon: Rocket,
       color: 'from-purple-400 to-purple-500',
