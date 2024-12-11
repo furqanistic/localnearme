@@ -61,7 +61,13 @@ app.use('/api/auth/', authRoute)
 app.use('/api/business/', businessRoute)
 app.use('/api/subscriptions/', subscriptionRoutes)
 app.use('/api/newsletter/', newsletterRoutes)
-
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "script-src 'self' https://js.stripe.com https://m.stripe.network https://checkout.stripe.com;"
+  )
+  next()
+})
 const connect = () => {
   mongoose
     .connect(process.env.MONGO)

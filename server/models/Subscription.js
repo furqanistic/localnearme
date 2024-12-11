@@ -14,8 +14,8 @@ const SubscriptionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'cancelled'],
-      default: 'active',
+      enum: ['active', 'cancelled', 'pending', 'failed'],
+      default: 'pending',
     },
     notifications: {
       email: {
@@ -33,6 +33,36 @@ const SubscriptionSchema = new mongoose.Schema(
     },
     cancellationDate: {
       type: Date,
+    },
+    // Stripe-related fields
+    stripeCustomerId: {
+      type: String,
+    },
+    stripeSubscriptionId: {
+      type: String,
+    },
+    stripePriceId: {
+      type: String,
+    },
+    currentPeriodStart: {
+      type: Date,
+    },
+    currentPeriodEnd: {
+      type: Date,
+    },
+    subscriptionPlan: {
+      type: String,
+      enum: ['starter', 'standard', 'business'],
+      default: 'starter',
+    },
+    // Add any plan-specific limits
+    monthlyQuota: {
+      type: Number,
+      default: 0,
+    },
+    usedQuota: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

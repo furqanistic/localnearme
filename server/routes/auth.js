@@ -24,7 +24,7 @@ router.put('/update/:id', updateUser)
 router.put('/change-password', changePassword)
 
 // Admin only routes
-router.use(restrictTo('admin'))
+router.use(restrictTo('Admin'))
 
 router.get('/all-users', getAllUsers)
 router.delete('/delete/:id', deleteUser)
