@@ -25,25 +25,25 @@ const BusinessPage = () => {
           <StatCard
             name='Total Listings'
             icon={Package}
-            value={1234}
+            value={0}
             color='#6366F1'
           />
           <StatCard
             name='Top Selling'
             icon={TrendingUp}
-            value={89}
+            value={0}
             color='#10B981'
           />
           <StatCard
             name='Incomplete'
             icon={AlertTriangle}
-            value={23}
+            value={0}
             color='#F59E0B'
           />
           <StatCard
             name='Total Revenue'
             icon={DollarSign}
-            value={'$543,210'}
+            value={'$0'}
             color='#EF4444'
           />
         </motion.div>
@@ -52,10 +52,10 @@ const BusinessPage = () => {
         <BusinessExplorer userLocation='Canada' />
 
         {/* CHARTS */}
-        <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
+        {/* <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
           <SalesTrendChart />
           <CategoryDistributionChart />
-        </div>
+        </div> */}
       </main>
     </div>
   )

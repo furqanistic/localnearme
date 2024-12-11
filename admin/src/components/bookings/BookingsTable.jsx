@@ -1,165 +1,163 @@
 import { motion } from 'framer-motion'
-import { Eye, Search } from 'lucide-react'
-import { useState } from 'react'
-
-const orderData = [
-  {
-    id: 'ORD001',
-    customer: 'User 1',
-    total: 235.4,
-    status: 'Active',
-    date: '2024-07-01',
-  },
-  {
-    id: 'ORD002',
-    customer: 'User 2',
-    total: 412.0,
-    status: 'Processing',
-    date: '2024-07-02',
-  },
-  {
-    id: 'ORD003',
-    customer: 'User 3',
-    total: 162.5,
-    status: 'Booked',
-    date: '2024-07-03',
-  },
-  {
-    id: 'ORD004',
-    customer: 'User 4',
-    total: 750.2,
-    status: 'Pending',
-    date: '2024-07-04',
-  },
-  {
-    id: 'ORD005',
-    customer: 'User 5',
-    total: 95.8,
-    status: 'Active',
-    date: '2024-07-05',
-  },
-  {
-    id: 'ORD006',
-    customer: 'User 6',
-    total: 310.75,
-    status: 'Processing',
-    date: '2024-07-06',
-  },
-  {
-    id: 'ORD007',
-    customer: 'User 7',
-    total: 528.9,
-    status: 'Booked',
-    date: '2024-07-07',
-  },
-  {
-    id: 'ORD008',
-    customer: 'User 8',
-    total: 189.6,
-    status: 'Active',
-    date: '2024-07-08',
-  },
-]
+import { ArrowUpDown, Eye, Search } from 'lucide-react'
+import React, { useState } from 'react'
 
 const BookingsTable = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredBookings, setFilteredBookings] = useState(orderData)
+  const [sortBy, setSortBy] = useState({ field: 'date', ascending: false })
 
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase()
-    setSearchTerm(term)
-    const filtered = orderData.filter(
+  const orderData = [
+    {
+      id: 'ORD001',
+      customer: 'User 1',
+      total: 235.4,
+      status: 'Active',
+      date: '2024-07-01',
+    },
+    {
+      id: 'ORD002',
+      customer: 'User 2',
+      total: 412.0,
+      status: 'Processing',
+      date: '2024-07-02',
+    },
+    {
+      id: 'ORD003',
+      customer: 'User 3',
+      total: 162.5,
+      status: 'Booked',
+      date: '2024-07-03',
+    },
+    {
+      id: 'ORD004',
+      customer: 'User 4',
+      total: 750.2,
+      status: 'Pending',
+      date: '2024-07-04',
+    },
+  ]
+
+  const getStatusStyle = (status) => {
+    const styles = {
+      Active: 'bg-emerald-500/20 text-emerald-400',
+      Processing: 'bg-amber-500/20 text-amber-400',
+      Booked: 'bg-blue-500/20 text-blue-400',
+      Pending: 'bg-rose-500/20 text-rose-400',
+    }
+    return styles[status] || 'bg-gray-500/20 text-gray-400'
+  }
+
+  const filteredData = orderData
+    .filter(
       (order) =>
-        order.id.toLowerCase().includes(term) ||
-        order.customer.toLowerCase().includes(term)
+        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customer.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    setFilteredBookings(filtered)
+    .sort((a, b) => {
+      const aValue = a[sortBy.field]
+      const bValue = b[sortBy.field]
+      const modifier = sortBy.ascending ? 1 : -1
+      return aValue > bValue ? modifier : -modifier
+    })
+
+  const handleSort = (field) => {
+    setSortBy((prev) => ({
+      field,
+      ascending: prev.field === field ? !prev.ascending : true,
+    }))
   }
 
   return (
-    <motion.div
-      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700'
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-    >
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-gray-100'>Order List</h2>
-        <div className='relative'>
+    <div className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6'>
+        <div>
+          <h2 className='text-xl font-semibold text-gray-100'>Orders</h2>
+          <p className='text-sm text-gray-400 mt-1'>
+            Manage your recent orders
+          </p>
+        </div>
+
+        <div className='relative w-full sm:w-auto'>
           <input
             type='text'
-            placeholder='Search Bookings...'
-            className='bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            placeholder='Search orders...'
+            className='w-full sm:w-64 bg-gray-700 text-white rounded-lg pl-10 pr-4 py-2 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Search className='absolute left-3 top-2.5 text-gray-400' size={18} />
         </div>
       </div>
 
       <div className='overflow-x-auto'>
-        <table className='min-w-full divide-y divide-gray-700'>
+        <table className='w-full'>
           <thead>
-            <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Order ID
-              </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Customer
-              </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Total
-              </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Status
-              </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Date
-              </th>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                Actions
-              </th>
+            <tr className='border-b border-gray-700'>
+              {[
+                { label: 'Order ID', field: 'id' },
+                { label: 'Customer', field: 'customer' },
+                { label: 'Amount', field: 'total' },
+                { label: 'Status', field: 'status' },
+                { label: 'Date', field: 'date' },
+                { label: '', field: null },
+              ].map((column) => (
+                <th
+                  key={column.label}
+                  className='text-left py-4 px-4 text-sm font-medium text-gray-400'
+                >
+                  {column.field ? (
+                    <button
+                      onClick={() => handleSort(column.field)}
+                      className='flex items-center gap-2 hover:text-gray-200'
+                    >
+                      {column.label}
+                      <ArrowUpDown size={14} className='opacity-50' />
+                    </button>
+                  ) : (
+                    column.label
+                  )}
+                </th>
+              ))}
             </tr>
           </thead>
 
-          <tbody className='divide divide-gray-700'>
-            {filteredBookings.map((order) => (
+          <tbody>
+            {filteredData.map((order) => (
               <motion.tr
                 key={order.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
+                className='border-b border-gray-700/50 hover:bg-gray-700/30'
               >
-                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>
-                  {order.id}
+                <td className='py-4 px-4'>
+                  <span className='font-medium text-gray-200'>{order.id}</span>
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>
-                  {order.customer}
+                <td className='py-4 px-4'>
+                  <span className='text-gray-300'>{order.customer}</span>
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>
-                  ${order.total.toFixed(2)}
+                <td className='py-4 px-4'>
+                  <span className='font-medium text-gray-200'>
+                    ${order.total.toFixed(2)}
+                  </span>
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+                <td className='py-4 px-4'>
                   <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      order.status === 'Active'
-                        ? 'bg-green-100 text-green-800'
-                        : order.status === 'Processing'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : order.status === 'Booked'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
+                      order.status
+                    )}`}
                   >
                     {order.status}
                   </span>
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                  {order.date}
+                <td className='py-4 px-4'>
+                  <span className='text-gray-300'>{order.date}</span>
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                  <button className='text-indigo-400 hover:text-indigo-300 mr-2'>
-                    <Eye size={18} />
+                <td className='py-4 px-4'>
+                  <button className='p-2 hover:bg-gray-700 rounded-lg transition-colors'>
+                    <Eye
+                      size={18}
+                      className='text-gray-400 hover:text-blue-400'
+                    />
                   </button>
                 </td>
               </motion.tr>
@@ -167,7 +165,8 @@ const BookingsTable = () => {
           </tbody>
         </table>
       </div>
-    </motion.div>
+    </div>
   )
 }
+
 export default BookingsTable

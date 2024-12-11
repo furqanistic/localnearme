@@ -14,8 +14,8 @@ import {
   SquareMenu,
   UserRoundCheck,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const SIDEBAR_ITEMS = [
   {
@@ -23,6 +23,7 @@ const SIDEBAR_ITEMS = [
     icon: BarChart2,
     color: '#6366f1',
     href: '/',
+    // badge: 'New',
   },
   {
     name: 'My Feed',
@@ -83,6 +84,7 @@ const SIDEBAR_ITEMS = [
     icon: Flame,
     color: '#3B82F6',
     href: '/Membership',
+    badge: 'Pro',
   },
   {
     name: 'Settings',
@@ -93,131 +95,168 @@ const SIDEBAR_ITEMS = [
 ]
 
 const Sidebar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-  const [activeItem, setActiveItem] = useState('/')
+  const location = useLocation()
   const scrollContainerRef = useRef(null)
+  const [hoveredItem, setHoveredItem] = useState(null)
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 915)
+      if (window.innerWidth < 915) {
+        setIsSidebarOpen(false)
+      }
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const toggleSidebar = () => {
-    if (!isMobile) {
-      setIsSidebarOpen(!isSidebarOpen)
-    }
-  }
-
   const isCollapsed = !isSidebarOpen || isMobile
 
   return (
-    <div
-      className={`relative z-10 flex-shrink-0 h-screen transition-[width] duration-200 ease-in-out ${
-        isCollapsed ? 'w-20' : 'w-60'
-      }`}
+    <motion.div
+      initial={false}
+      animate={{
+        width: isCollapsed ? 80 : 240,
+      }}
+      className='relative z-10 flex-shrink-0 h-screen'
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      <div className='h-full bg-gray-800 backdrop-blur-lg flex flex-col border-r border-gray-800/50 shadow-xl'>
+      <div className='h-full bg-gradient-to-b from-gray-900 to-gray-800 flex flex-col border-r border-gray-700/50 shadow-2xl'>
         {/* Logo Section */}
-        <div className='flex flex-col items-center py-5 border-b border-gray-800/50 relative'>
-          <div className='relative bg-purple-200 p-1 rounded'>
+        <motion.div
+          className='flex flex-col items-center py-6 border-b border-gray-700/50 relative'
+          initial={false}
+          animate={{
+            paddingLeft: isCollapsed ? '0.75rem' : '1.5rem',
+            paddingRight: isCollapsed ? '0.75rem' : '1.5rem',
+          }}
+        >
+          <motion.div
+            className='relative bg-gradient-to-br from-purple-400 to-purple-600 p-2 rounded-xl shadow-lg'
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <img
               src='weblogo.png'
               alt='Logo'
-              className={`object-contain rounded-xl transition-all duration-200 ${
-                isCollapsed ? 'w-11 h-11' : 'w-12 h-12'
-              }`}
+              className='object-contain rounded-lg transition-all duration-200 w-12 h-12'
             />
-          </div>
+          </motion.div>
 
-          <button
-            onClick={toggleSidebar}
-            className={`absolute -right-2.5 top-6 p-1.5 rounded-full bg-gray-800/90 border border-gray-700/50 shadow-lg hover:bg-gray-900 transition-colors ${
-              isMobile ? 'pointer-events-none opacity-0' : ''
-            }`}
-          >
-            <ChevronLeft
-              size={14}
-              className={`transform transition-transform duration-200 ${
-                !isCollapsed ? 'rotate-180' : ''
-              }`}
-            />
-          </button>
-        </div>
+          {!isMobile && (
+            <motion.button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className='absolute -right-3 top-8 p-1.5 rounded-full bg-gray-800 border border-gray-600 shadow-lg hover:bg-gray-700 transition-colors'
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ChevronLeft
+                size={16}
+                className={`transform transition-transform duration-200 text-gray-300 ${
+                  !isCollapsed ? 'rotate-180' : ''
+                }`}
+              />
+            </motion.button>
+          )}
+        </motion.div>
 
         {/* Navigation Section */}
         <nav
           ref={scrollContainerRef}
-          className='flex-grow overflow-y-auto overflow-x-hidden py-3 px-2'
+          className='flex-grow overflow-y-auto overflow-x-hidden py-4 px-3 space-y-1'
           style={{
             scrollbarWidth: 'thin',
             scrollbarColor: '#4B5563 transparent',
           }}
         >
-          <div className='space-y-0.5'>
+          <AnimatePresence>
             {SIDEBAR_ITEMS.map((item) => (
-              <Link
+              <motion.div
                 key={item.href}
-                to={item.href}
-                onClick={() => setActiveItem(item.href)}
-                className='block'
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
               >
-                <div
-                  className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 group relative ${
-                    activeItem === item.href
-                      ? 'bg-gray-900/80'
-                      : 'hover:bg-gray-900/40'
-                  } ${!isCollapsed ? 'hover:translate-x-1' : ''}`}
+                <Link
+                  to={item.href}
+                  onMouseEnter={() => setHoveredItem(item.href)}
+                  onMouseLeave={() => setHoveredItem(null)}
                 >
-                  {/* Active Indicator */}
-                  <div
-                    className={`absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4/6 rounded-full transition-all duration-200 ${
-                      activeItem === item.href
-                        ? 'bg-blue-500'
-                        : 'bg-transparent group-hover:bg-gray-900'
+                  <motion.div
+                    className={`flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
+                      location.pathname === item.href
+                        ? 'bg-gray-700/50 shadow-lg'
+                        : 'hover:bg-gray-700/30'
                     }`}
-                  />
-
-                  {/* Content */}
-                  <div className='flex items-center gap-3 min-w-0'>
-                    <div
-                      className={`relative rounded-md p-1.5 transition-colors duration-200 ${
-                        activeItem === item.href ? 'bg-gray-900/50' : ''
+                    whileHover={{ x: isCollapsed ? 0 : 4 }}
+                  >
+                    <motion.div
+                      className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4/6 rounded-full ${
+                        location.pathname === item.href
+                          ? 'bg-gradient-to-b from-blue-400 to-blue-600'
+                          : 'bg-transparent'
                       }`}
-                    >
-                      <item.icon
-                        size={16}
-                        className='flex-shrink-0 transition-colors duration-200'
-                        style={{
-                          color: activeItem === item.href ? '#fff' : item.color,
-                          opacity: activeItem === item.href ? 1 : 0.8,
-                        }}
-                      />
-                    </div>
+                      initial={false}
+                      animate={{
+                        height: location.pathname === item.href ? '60%' : '0%',
+                      }}
+                      transition={{ duration: 0.2 }}
+                    />
 
-                    {!isCollapsed && (
-                      <span
-                        className={`truncate text-sm font-medium transition-colors duration-200 ${
-                          activeItem === item.href
-                            ? 'text-gray-100'
-                            : 'text-gray-400'
+                    <div className='flex items-center gap-3 min-w-0'>
+                      <motion.div
+                        className={`relative rounded-lg p-2 ${
+                          location.pathname === item.href
+                            ? 'bg-gray-600/50'
+                            : ''
                         }`}
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        {item.name}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+                        <item.icon
+                          size={18}
+                          className='flex-shrink-0'
+                          style={{
+                            color:
+                              location.pathname === item.href
+                                ? '#fff'
+                                : item.color,
+                            opacity: location.pathname === item.href ? 1 : 0.8,
+                          }}
+                        />
+                      </motion.div>
+
+                      {!isCollapsed && (
+                        <div className='flex items-center justify-between flex-1'>
+                          <span
+                            className={`truncate text-sm font-medium transition-colors duration-200 ${
+                              location.pathname === item.href
+                                ? 'text-gray-100'
+                                : 'text-gray-400'
+                            }`}
+                          >
+                            {item.name}
+                          </span>
+                          {item.badge && (
+                            <span className='ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white'>
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </AnimatePresence>
         </nav>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

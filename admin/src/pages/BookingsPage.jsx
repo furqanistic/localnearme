@@ -8,10 +8,10 @@ import Header from '../components/common/Header'
 import StatCard from '../components/common/StatCard'
 
 const Bookingstats = {
-  totalBookings: '1,234',
-  pendingBookings: '56',
-  completedBookings: '1,178',
-  totalRevenue: '$98,765',
+  totalBookings: '0',
+  pendingBookings: '0',
+  completedBookings: '0',
+  totalRevenue: '$0',
 }
 
 const BookingsPage = () => {
@@ -51,13 +51,12 @@ const BookingsPage = () => {
             color='#EF4444'
           />
         </motion.div>
+        <BookingsTable />
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
+        {/* <div className='mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
           <DailyBookings />
           <OrderDistribution />
-        </div>
-
-        <BookingsTable />
+        </div> */}
       </main>
     </div>
   )
