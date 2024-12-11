@@ -8,21 +8,21 @@ const FlyerPage = () => {
   const metrics = [
     {
       title: 'Monthly Limit',
-      value: '8/30',
+      value: '0',
       icon: Mail,
       description: 'Flyers sent this month',
       color: 'bg-blue-500',
     },
     {
       title: 'Active Subscribers',
-      value: '1,234',
+      value: '0',
       icon: Users,
       description: '+12% this month',
       color: 'bg-purple-500',
     },
     {
       title: 'Average Response',
-      value: '2.5h',
+      value: '0',
       icon: Clock,
       description: 'Response time',
       color: 'bg-emerald-500',

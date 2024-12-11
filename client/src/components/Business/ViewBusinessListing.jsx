@@ -3,64 +3,59 @@ import LoginRequiredModal from '@/Pages/Auth/LoginRequiredModal'
 import {
   Award,
   Bell,
+  CheckCheck,
   ChevronLeft,
   ChevronRight,
-  FileText,
+  Copy,
   Globe,
   Heart,
+  Linkedin,
   Mail,
   MapPin,
   MessageCircle,
   Phone,
+  QrCode,
   Share2,
-  Star,
-  Tag,
+  X,
 } from 'lucide-react'
-import { useState } from 'react'
-import toast from 'react-hot-toast'
+import React, { useState } from 'react'
+import QRCode from 'react-qr-code'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
-import Loader from '../utils/Loader'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ViewBusinessListing = ({ business }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showQRModal, setShowQRModal] = useState(false)
+  const location = useLocation()
   const queryClient = useQueryClient()
-  const param = useParams()
   const navigate = useNavigate()
   const { currentUser } = useSelector((state) => state.user)
-
-  // Check subscription status
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const currentUrl = window.location.href
+  // Subscription status query
   const { data: subscriptionStatus, isLoading: checkingSubscription } =
     useQuery(
       ['subscription', business._id],
       async () => {
         try {
           const response = await axiosInstance.get(
-            `/subscriptions/my-subscriptions`
+            '/subscriptions/my-subscriptions'
           )
           return response.data.data.subscriptions.some(
             (sub) => sub.business._id === business._id
           )
         } catch (error) {
-          if (error.response?.status === 401) {
-            // Don't navigate to login page on 401, just return false
-            return false
-          }
+          if (error.response?.status === 401) return false
           throw error
         }
       },
       {
-        // Only enable the query if we have both a business ID and a logged-in user
         enabled: !!business._id && !!currentUser,
         retry: 1,
-        // Initialize with false when disabled
         initialData: false,
-        onError: (error) => {
-          console.error('Error checking subscription:', error)
-          toast.error('Unable to check subscription status')
-        },
       }
     )
 
@@ -73,21 +68,127 @@ const ViewBusinessListing = ({ business }) => {
       return response.data
     },
     {
-      onSuccess: (data) => {
-        toast.success('Successfully subscribed to business')
+      onSuccess: () => {
         queryClient.invalidateQueries(['subscription', business._id])
         queryClient.invalidateQueries(['business', business._id])
       },
-      onError: (error) => {
-        if (error.response?.status === 401) {
-          navigate('/login')
-          toast.error('Please login to subscribe')
-        } else {
-          toast.error(error.response?.data?.message || 'Failed to subscribe')
-        }
-      },
     }
   )
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const ShareModal = () => {
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        currentUrl
+      )}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+        currentUrl
+      )}&text=${encodeURIComponent(`Check out ${business.name}!`)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        currentUrl
+      )}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(
+        `Check out ${business.name}! ${currentUrl}`
+      )}`,
+    }
+
+    return (
+      <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4'>
+        <div className='bg-gray-900 rounded-xl max-w-md w-full relative'>
+          {/* Header */}
+          <div className='border-b border-gray-700 p-4'>
+            <div className='flex justify-between items-center'>
+              <h3 className='text-xl font-semibold'>Share {business.name}</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className='text-gray-400 hover:text-white transition-colors'
+              >
+                <X className='w-6 h-6' />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className='p-6 space-y-6'>
+            {/* Copy Link Section */}
+            <div className='space-y-3'>
+              <h4 className='text-sm font-medium text-gray-400'>Copy Link</h4>
+              <div className='flex gap-2'>
+                <div className='flex-1 bg-gray-800 rounded-lg px-4 py-2 text-sm truncate'>
+                  {currentUrl}
+                </div>
+                <button
+                  onClick={handleCopyLink}
+                  className='bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg flex items-center gap-2 transition-colors'
+                >
+                  {copied ? (
+                    <CheckCheck className='w-4 h-4' />
+                  ) : (
+                    <Copy className='w-4 h-4' />
+                  )}
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
+
+            {/* Social Share Section */}
+            <div className='space-y-3'>
+              <h4 className='text-sm font-medium text-gray-400'>
+                Share on Social Media
+              </h4>
+              <div className='grid grid-cols-2 gap-3'>
+                <a
+                  href={shareUrls.facebook}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center gap-3 bg-[#1877F2]/10 hover:bg-[#1877F2]/20 text-[#1877F2] p-3 rounded-lg transition-colors'
+                >
+                  <Share2 className='w-5 h-5' />
+                  <span>Facebook</span>
+                </a>
+                <a
+                  href={shareUrls.twitter}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center gap-3 bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 text-[#1DA1F2] p-3 rounded-lg transition-colors'
+                >
+                  <MessageCircle className='w-5 h-5' />
+                  <span>Twitter</span>
+                </a>
+                <a
+                  href={shareUrls.linkedin}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center gap-3 bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 text-[#0A66C2] p-3 rounded-lg transition-colors'
+                >
+                  <Linkedin className='w-5 h-5' />
+                  <span>LinkedIn</span>
+                </a>
+                <a
+                  href={shareUrls.whatsapp}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center gap-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] p-3 rounded-lg transition-colors'
+                >
+                  <MessageCircle className='w-5 h-5' />
+                  <span>WhatsApp</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Unsubscribe mutation
   const unsubscribeMutation = useMutation(
@@ -98,18 +199,9 @@ const ViewBusinessListing = ({ business }) => {
       return response.data
     },
     {
-      onSuccess: (data) => {
-        toast.success('Successfully unsubscribed from business')
+      onSuccess: () => {
         queryClient.invalidateQueries(['subscription', business._id])
         queryClient.invalidateQueries(['business', business._id])
-      },
-      onError: (error) => {
-        if (error.response?.status === 401) {
-          navigate('/login')
-          toast.error('Please login to manage subscriptions')
-        } else {
-          toast.error(error.response?.data?.message || 'Failed to unsubscribe')
-        }
       },
     }
   )
@@ -122,9 +214,9 @@ const ViewBusinessListing = ({ business }) => {
 
     try {
       if (subscriptionStatus) {
-        unsubscribeMutation.mutate()
+        await unsubscribeMutation.mutateAsync()
       } else {
-        subscribeMutation.mutate()
+        await subscribeMutation.mutateAsync()
       }
     } catch (error) {
       console.error('Subscription error:', error)
@@ -147,127 +239,170 @@ const ViewBusinessListing = ({ business }) => {
     // Add review logic here
   }
 
+  const QRModal = () => (
+    <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50'>
+      <div className='bg-gray-900 p-8 rounded-xl relative max-w-md w-full mx-4'>
+        <button
+          onClick={() => setShowQRModal(false)}
+          className='absolute top-4 right-4 text-gray-400 hover:text-white'
+        >
+          <X className='w-6 h-6' />
+        </button>
+        <h3 className='text-xl font-semibold mb-6 text-white text-center'>
+          Scan to Visit
+        </h3>
+        <div className='bg-white p-4 rounded-lg'>
+          <QRCode value={currentUrl} className='w-full h-auto' />
+        </div>
+        <p className='text-sm text-gray-400 mt-4 text-center'>
+          Scan this QR code to open this page on your mobile device
+        </p>
+      </div>
+    </div>
+  )
+
   if (checkingSubscription) {
-    return <Loader />
-  }
-
-  const nextImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % business.images.length
-    )
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + business.images.length) % business.images.length
+    return (
+      <div className='min-h-screen bg-[#141414] flex items-center justify-center'>
+        <div className='w-8 h-8 border-t-2 border-b-2 border-blue-400 rounded-full animate-spin'></div>
+      </div>
     )
   }
 
   return (
     <div className='bg-[#141414] text-gray-200 min-h-screen'>
-      <div className='max-w-7xl mx-auto px-4 py-12'>
-        <h1 className='text-4xl font-bold mb-8 text-white'>{business.name}</h1>
+      {/* Hero Section */}
+      <div className='relative h-[80vh] w-full'>
+        <div className='absolute inset-0'>
+          <img
+            src={business.images[currentImageIndex]}
+            alt={business.name}
+            className='w-full h-full object-cover'
+          />
+          <div className='absolute inset-0 bg-gradient-to-t from-[#141414] via-black/50 to-transparent' />
+        </div>
 
-        {/* Image Carousel */}
-        <div className='relative w-full h-[70vh] mb-12 rounded-xl overflow-hidden'>
-          {business.images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`${business.name} - Image ${index + 1}`}
-              className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ${
-                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          ))}
-          <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent'></div>
+        {/* Navigation arrows */}
+        <div className='absolute inset-0 flex items-center justify-between px-4'>
           <button
-            onClick={prevImage}
-            className='absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 rounded-full p-3 transition-colors duration-300'
+            onClick={() =>
+              setCurrentImageIndex(
+                (prev) =>
+                  (prev - 1 + business.images.length) % business.images.length
+              )
+            }
+            className='bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors'
           >
-            <ChevronLeft className='w-6 h-6 text-white' />
+            <ChevronLeft className='w-6 h-6' />
           </button>
           <button
-            onClick={nextImage}
-            className='absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 rounded-full p-3 transition-colors duration-300'
+            onClick={() =>
+              setCurrentImageIndex(
+                (prev) => (prev + 1) % business.images.length
+              )
+            }
+            className='bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors'
           >
-            <ChevronRight className='w-6 h-6 text-white' />
+            <ChevronRight className='w-6 h-6' />
           </button>
         </div>
-        {/* Business Info */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
-          <div className='lg:col-span-2 space-y-8'>
-            <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>
-                About {business.name}
-              </h2>
-              <p className='text-gray-300 mb-6 leading-relaxed'>
-                {business.description}
-              </p>
-              <div className='space-y-4'>
-                <div className='flex items-center'>
-                  <MapPin className='w-5 h-5 mr-3 text-blue-400' />
-                  <span>{`${business.address.street}, ${business.address.city}, ${business.address.state} ${business.address.zipCode}, ${business.address.country}`}</span>
-                </div>
-                <div className='flex items-center'>
-                  <Phone className='w-5 h-5 mr-3 text-blue-400' />
-                  <span>{business.phoneNumber}</span>
-                </div>
-                {business.websiteUrl && (
-                  <div className='flex items-center'>
-                    <Globe className='w-5 h-5 mr-3 text-blue-400' />
-                    <a
-                      href={business.websiteUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-400 hover:text-blue-300 transition-colors'
-                    >
-                      Visit Website
-                    </a>
-                  </div>
-                )}
-                <div className='flex items-center'>
-                  <Mail className='w-5 h-5 mr-3 text-blue-400' />
-                  <span>{business.contactEmail}</span>
-                </div>
-                {business.googleMapsUrl && (
-                  <div className='flex items-center'>
-                    <MapPin className='w-5 h-5 mr-3 text-blue-400' />
-                    <a
-                      href={business.googleMapsUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-400 hover:text-blue-300 transition-colors'
-                    >
-                      View on Google Maps
-                    </a>
-                  </div>
-                )}
-                {business.menu && (
-                  <div className='flex items-center'>
-                    <FileText className='w-5 h-5 mr-3 text-blue-400' />
-                    <a
-                      href={business.menu}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-400 hover:text-blue-300 transition-colors'
-                    >
-                      View Menu
-                    </a>
-                  </div>
+
+        {/* Hero content */}
+        <div className='absolute bottom-0 left-0 right-0 p-8 max-w-7xl mx-auto'>
+          <div className='flex items-start justify-between'>
+            <div>
+              <h1 className='text-5xl font-bold text-white mb-4'>
+                {business.name}
+              </h1>
+              <div className='flex items-center space-x-4 text-sm'>
+                <span className='flex items-center'>
+                  <MapPin className='w-4 h-4 mr-1' />
+                  {business.address.city}, {business.address.country}
+                </span>
+                {business.isPremium && (
+                  <span className='flex items-center text-yellow-400'>
+                    <Award className='w-4 h-4 mr-1' />
+                    Premium
+                  </span>
                 )}
               </div>
             </div>
+            <div className='flex space-x-3'>
+              <button
+                onClick={() => setShowQRModal(true)}
+                className='bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors'
+              >
+                <QrCode className='w-6 h-6' />
+              </button>
+              <button
+                onClick={() => setShowShareModal(true)}
+                className='bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors'
+              >
+                <Share2 className='w-6 h-6' />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Opening Hours */}
-            <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>
-                Opening Hours
-              </h2>
-              <ul className='space-y-2'>
+      {/* Main Content */}
+      <div className='max-w-7xl mx-auto px-4 py-12'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+          {/* Main Column */}
+          <div className='lg:col-span-2 space-y-8'>
+            {/* About Section */}
+            <div className='bg-gray-900/50 backdrop-blur-sm rounded-xl p-8'>
+              <h2 className='text-2xl font-semibold mb-6'>About</h2>
+              <p className='text-gray-300 leading-relaxed'>
+                {business.description}
+              </p>
+
+              <div className='grid grid-cols-2 gap-6 mt-8'>
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium text-blue-400'>Contact</h3>
+                  <div className='space-y-2'>
+                    <p className='flex items-center'>
+                      <Phone className='w-4 h-4 mr-2 text-gray-400' />
+                      {business.phoneNumber}
+                    </p>
+                    <p className='flex items-center'>
+                      <Mail className='w-4 h-4 mr-2 text-gray-400' />
+                      {business.contactEmail}
+                    </p>
+                    {business.websiteUrl && (
+                      <a
+                        href={business.websiteUrl}
+                        className='flex items-center text-blue-400 hover:text-blue-300'
+                      >
+                        <Globe className='w-4 h-4 mr-2' />
+                        Visit Website
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium text-blue-400'>
+                    Location
+                  </h3>
+                  <p className='flex items-start'>
+                    <MapPin className='w-4 h-4 mr-2 mt-1 text-gray-400' />
+                    <span>
+                      {business.address.street}, {business.address.city},
+                      <br />
+                      {business.address.state} {business.address.zipCode}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hours Section */}
+            <div className='bg-gray-900/50 backdrop-blur-sm rounded-xl p-8'>
+              <h2 className='text-2xl font-semibold mb-6'>Opening Hours</h2>
+              <div className='grid grid-cols-2 gap-4'>
                 {business.openingHours.map((hours, index) => (
-                  <li
+                  <div
                     key={index}
                     className='flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0'
                   >
@@ -275,105 +410,40 @@ const ViewBusinessListing = ({ business }) => {
                       {hours.day}
                     </span>
                     <span>{`${hours.open} - ${hours.close}`}</span>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
-            {/* Tags */}
+            {/* Tags Section */}
             {business.tags && business.tags.length > 0 && (
-              <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-                <h2 className='text-3xl font-semibold mb-6 text-white'>Tags</h2>
-                <div className='flex flex-wrap gap-3'>
+              <div className='bg-gray-900/50 backdrop-blur-sm rounded-xl p-8'>
+                <h2 className='text-2xl font-semibold mb-6'>Tags</h2>
+                <div className='flex flex-wrap gap-2'>
                   {business.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className='bg-blue-600 text-white px-4 py-2 rounded-full text-sm flex items-center'
+                      className='bg-blue-600/20 text-blue-400 px-4 py-2 rounded-full text-sm'
                     >
-                      <Tag className='w-4 h-4 mr-2' />
                       {tag}
                     </span>
                   ))}
                 </div>
               </div>
             )}
-
-            {/* Digital Flyer */}
-            {business.digitalFlyer && business.digitalFlyer.isActive && (
-              <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-                <h2 className='text-3xl font-semibold mb-6 text-white'>
-                  Digital Flyer
-                </h2>
-                <p>
-                  Subscribe to receive our digital flyer and stay updated on our
-                  latest offers!
-                </p>
-                <p className='mt-2'>
-                  Subscribers: {business.digitalFlyer.subscriberCount}
-                </p>
-              </div>
-            )}
-
-            {/* Review System */}
-            {business.reviewSystem && business.reviewSystem.isActive && (
-              <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-                <h2 className='text-3xl font-semibold mb-6 text-white'>
-                  Customer Reviews
-                </h2>
-                <p>
-                  We value your feedback! Leave a review and help us improve.
-                </p>
-                <p className='mt-2'>
-                  Minimum rating: {business.reviewSystem.minimumRating} stars
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Sidebar */}
-          <div className='space-y-8'>
-            <div className='bg-gray-900 rounded-xl p-8 shadow-lg'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>
-                Business Details
-              </h2>
-              <div className='space-y-4'>
-                <p>
-                  <strong className='text-blue-400'>Type:</strong>{' '}
-                  {business.type}
-                </p>
-                <p>
-                  <strong className='text-blue-400'>Subscribers:</strong>{' '}
-                  {business.subscriberCount}
-                </p>
-                <p>
-                  <strong className='text-blue-400'>Favorites:</strong>{' '}
-                  {business.favoriteCount}
-                </p>
-                {business.isPremium && (
-                  <p className='text-yellow-400 font-semibold mt-4 flex items-center'>
-                    <Award className='w-5 h-5 mr-2' />
-                    Premium Business
-                  </p>
-                )}
-                <p>
-                  <strong className='text-blue-400'>
-                    Minimum Review Filter:
-                  </strong>{' '}
-                  {business.minimumReviewFilter} stars
-                </p>
-              </div>
-            </div>
-
+          <div className='space-y-6'>
             {/* Action Buttons */}
-            {/* Action Buttons */}
-            <div className='space-y-4'>
+            <div className='bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 space-y-4'>
               <button
                 onClick={handleSubscribe}
                 disabled={
                   subscribeMutation.isLoading || unsubscribeMutation.isLoading
                 }
                 className={`w-full py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                  subscriptionStatus && currentUser
+                  subscriptionStatus
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
@@ -386,62 +456,56 @@ const ViewBusinessListing = ({ business }) => {
                   </div>
                 ) : (
                   <>
-                    <Bell
-                      className={`w-5 h-5 mr-2 ${
-                        subscriptionStatus && currentUser ? 'animate-ring' : ''
-                      }`}
-                    />
-                    {subscriptionStatus && currentUser
-                      ? 'Unsubscribe'
-                      : 'Subscribe'}
+                    <Bell className='w-5 h-5 mr-2' />
+                    {subscriptionStatus ? 'Subscribed' : 'Subscribe'}
                   </>
                 )}
               </button>
 
-              {/* Subscription Status Indicator */}
-              {subscriptionStatus && currentUser && (
-                <div className='bg-green-600/20 p-4 rounded-xl'>
-                  <p className='text-green-400 flex items-center'>
-                    <Bell className='w-5 h-5 mr-2' />
-                    You're subscribed
-                  </p>
-                </div>
-              )}
               <button
                 onClick={handleFavorite}
-                className='w-full bg-pink-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-pink-700 transition-colors duration-300'
+                className='w-full bg-pink-600/20 text-pink-400 border border-pink-600/30 py-3 px-6 rounded-xl flex items-center justify-center hover:bg-pink-600/30 transition-colors'
               >
-                <Heart className='w-5 h-5 mr-3' />
+                <Heart className='w-5 h-5 mr-2' />
                 Add to Favorites
               </button>
-              <button className='w-full bg-purple-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-purple-700 transition-colors duration-300'>
-                <Share2 className='w-5 h-5 mr-3' />
-                Share
-              </button>
-              {business.googleReviewsUrl && (
-                <a
-                  href={business.googleReviewsUrl}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='w-full bg-yellow-700 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-yellow-800 transition-colors duration-300'
-                >
-                  <Star className='w-5 h-5 mr-3' />
-                  Google Reviews
-                </a>
-              )}
-              {business.reviewSystem && business.reviewSystem.isActive && (
+
+              {business.reviewSystem?.isActive && (
                 <button
                   onClick={handleReview}
-                  className='w-full bg-green-600 text-white py-3 px-6 rounded-xl flex items-center justify-center hover:bg-green-700 transition-colors duration-300'
+                  className='w-full bg-green-600/20 text-green-400 border border-green-600/30 py-3 px-6 rounded-xl flex items-center justify-center hover:bg-green-600/30 transition-colors'
                 >
-                  <MessageCircle className='w-5 h-5 mr-3' />
-                  Leave a Review
+                  <MessageCircle className='w-5 h-5 mr-2' />
+                  Write a Review
                 </button>
               )}
+            </div>
+
+            {/* Business Stats */}
+            <div className='bg-gray-900/50 backdrop-blur-sm rounded-xl p-6'>
+              <h3 className='text-xl font-semibold mb-4'>Stats</h3>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+                  <p className='text-2xl font-bold text-blue-400'>
+                    {business.subscriberCount}
+                  </p>
+                  <p className='text-sm text-gray-400'>Subscribers</p>
+                </div>
+                <div className='text-center p-4 bg-gray-800/50 rounded-lg'>
+                  <p className='text-2xl font-bold text-pink-400'>
+                    {business.favoriteCount}
+                  </p>
+                  <p className='text-sm text-gray-400'>Favorites</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showShareModal && <ShareModal />}
+      {showQRModal && <QRModal />}
       <LoginRequiredModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}

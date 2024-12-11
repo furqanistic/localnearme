@@ -22,28 +22,23 @@ const OverviewPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
+          <StatCard name='Total Sales' icon={Zap} value='$0' color='#6366F1' />
           <StatCard
-            name='Total Sales'
-            icon={Zap}
-            value='$12,345'
-            color='#6366F1'
-          />
-          <StatCard
-            name='New Users'
+            name='New Subscribers'
             icon={Users}
-            value='1,234'
+            value='0'
             color='#8B5CF6'
           />
           <StatCard
             name='Total Listings'
             icon={ShoppingBag}
-            value='567'
+            value='0'
             color='#EC4899'
           />
           <StatCard
             name='Conversion Rate'
             icon={BarChart2}
-            value='12.5%'
+            value='0%'
             color='#10B981'
           />
         </motion.div>
